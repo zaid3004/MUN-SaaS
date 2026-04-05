@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Delegates (Event {{ event_id }})</h2>
+<form method="post" class="mb-3">
+  <div class="row g-3 align-items-end">
+    <div class="col-4">
+      <label class="form-label">Name</label>
+      <input type="text" name="name" class="form-control" required>
+    </div>
+    <div class="col-4">
+      <label class="form-label">Email</label>
+      <input type="email" name="email" class="form-control" required>
+    </div>
+    <div class="col-4">
+      <label class="form-label">Password</label>
+      <input type="password" name="password" class="form-control" required>
+    </div>
+    <div class="col-2">
+      <label class="form-label">Country</label>
+      <input type="text" name="country" class="form-control">
+    </div>
+    <div class="col-2">
+      <label class="form-label">Committee</label>
+      <select class="form-control" name="committee_id">
+        <option value="">None</option>
+        {% for c in committees %}
+        <option value="{{ c.id }}">{{ c.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-primary" type="submit">Add Delegate</button>
+    </div>
+  </div>
+</form>
+<h4>Delegates</h4>
+<ul class="list-group">
+  {% for d in delegates %}
+  <li class="list-group-item d-flex justify-content-between align-items-center">
+    <span>{{ d.name }} ({{ d.email }}) - {{ d.country }} - {{ d.committee or '' }}</span>
+    <span>
+      <a href="/events/{{ event_id }}/delegates/{{ d.id }}/documents" class="btn btn-sm btn-outline-secondary me-2">Docs</a>
+      <a href="/events/{{ event_id }}/delegates?committee_id={{ d.committee_id }}" class="btn btn-sm btn-outline-primary">Delegates</a>
+      <a href="/events/{{ event_id }}/delegates/{{ d.id }}/edit" class="btn btn-sm btn-outline-success ms-2">Edit</a>
+    </span>
+  </li>
+  {% endfor %}
+  {% if not delegates %}
+  <li class="list-group-item">No delegates yet.</li>
+  {% endif %}
+</ul>
+{% endblock %}

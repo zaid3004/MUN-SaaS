@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Events</h2>
+<form method="post" class="mb-4">
+  <div class="row g-3 align-items-end">
+    <div class="col">
+      <label class="form-label">Name</label>
+      <input type="text" name="name" class="form-control" required>
+    </div>
+    <div class="col">
+      <label class="form-label">Start Date</label>
+      <input type="date" name="start_date" class="form-control">
+    </div>
+    <div class="col">
+      <label class="form-label">End Date</label>
+      <input type="date" name="end_date" class="form-control">
+    </div>
+    <div class="col-auto">
+      <label class="form-label">&nbsp;</label>
+      <button class="btn btn-primary" type="submit">Create</button>
+    </div>
+  </div>
+  <div class="mt-2">
+    <textarea name="description" class="form-control" placeholder="Description"></textarea>
+  </div>
+</form>
+{% if events %}
+  <div class="list-group">
+    {% for e in events %}
+    <a href="events/{{ e.id }}/committees" class="list-group-item list-group-item-action">
+      <div class="d-flex w-100 justify-content-between">
+        <h5 class="mb-1">{{ e.name }}</h5>
+        <small>{{ e.start_date }} - {{ e.end_date }}</small>
+      </div>
+      <p class="mb-1">{{ e.description or '' }}</p>
+    </a>
+    {% endfor %}
+  </div>
+{% else %}
+  <p>No events yet. Create your first event above.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="hero mb-4 animate__animated animate__fadeIn animate__slow">
+  <div>
+    <h1 style="margin:0">MUN SaaS Dashboard</h1>
+    <p class="muted" style="color:var(--muted); margin:6px 0 0;">Centralized event management with elegant visuals</p>
+  </div>
+  <div aria-label="decorative-graphic" style="width:180px; height:120px;">
+    <!-- Simple decorative SVG to convey structure/organization -->
+    <svg viewBox="0 0 180 120" width="100%" height="100%" role="img" aria-label="dashboard-graphic">
+      <defs>
+        <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+          <stop stop-color="#6c8cff" offset="0"/>
+          <stop stop-color="#22c55e" offset="1"/>
+        </linearGradient>
+      </defs>
+      <rect x="0" y="0" width="180" height="120" fill="url(#lg)" opacity=".08" />
+      <circle cx="40" cy="60" r="12" fill="#6c8cff" />
+      <circle cx="80" cy="60" r="12" fill="#22c55e" />
+      <rect x="110" y="30" width="40" height="60" rx="6" fill="#fff" opacity=".6"/>
+    </svg>
+  </div>
+  <div class="water" aria-label="water-wave" style="width:100%;">
+    <svg class="water-wave" viewBox="0 0 1200 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%;">
+      <path d="M0,60 C200,90 400,30 600,60 C800,90 1000,30 1200,60 L1200,120 L0,120 Z" fill="#6c8cff" opacity="0.25"></path>
+    </svg>
+  </div>
+</section>
+
+<div class="row mb-3" aria-label="stats">
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body text-center">
+        <div class="stat">{{ events|length or 0 }}</div>
+        <div class="text-muted">Upcoming Events</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body text-center">
+        <div class="stat">{{ (delegates|length) or 0 }}</div>
+        <div class="text-muted">Delegates</div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body text-center">
+        <div class="stat">{{ (committees|length) or 0 }}</div>
+        <div class="text-muted">Committees</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if announcements and announcements|length > 0 %}
+<div class="card mb-4 border-warning">
+  <div class="card-header bg-warning text-dark">📢 Recent Announcements</div>
+  <div class="list-group list-group-flush">
+    {% for ann in announcements[:3] %}
+    <a href="/events/{{ ann.event_id }}/announcements" class="list-group-item list-group-item-action">
+      <div class="d-flex w-100 justify-content-between">
+        <h6 class="mb-1">{{ ann.title }}</h6>
+        <small>{{ ann.event.name }}</small>
+      </div>
+      <p class="mb-1 text-truncate">{{ ann.content[:100] }}{% if ann.content|length > 100 %}...{% endif %}</p>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<div class="row">
+  {% for event in events %}
+  <div class="col-md-4 mb-3 animate__animated animate__fadeInUp" style="animation-delay: {{ loop.index0 * 0.08 }}s;">
+    <div class="card">
+      <div class="card-body">
+        <h5 class="card-title">{{ event.name }}</h5>
+        <p class="card-text">{{ event.description or '' }}</p>
+        <div class="btn-group w-100" role="group">
+          <a href="/events/{{ event.id }}/committees" class="btn btn-sm btn-outline-primary">Committees</a>
+          <a href="/events/{{ event.id }}/announcements" class="btn btn-sm btn-outline-info">Announcements</a>
+          <a href="/events/{{ event.id }}/chat" class="btn btn-sm btn-outline-secondary">Chat</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

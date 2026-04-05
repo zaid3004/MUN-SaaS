@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Edit Delegate</h2>
+<form method="post" class="mt-3">
+  <div class="mb-3">
+    <label class="form-label">Name</label>
+    <input type="text" name="name" class="form-control" value="{{ user.name }}" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Email</label>
+    <input type="email" name="email" class="form-control" value="{{ user.email }}" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Country</label>
+    <input type="text" name="country" class="form-control" value="{{ user.country }}">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Password (leave blank to keep)</label>
+    <input type="password" name="password" class="form-control" placeholder="New password">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Committee</label>
+    <select class="form-control" name="committee_id">
+      <option value="">None</option>
+      {% for c in committees %}
+      <option value="{{ c.id }}" {% if c.id == committee_id %}selected{% endif %}>{{ c.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <button class="btn btn-primary" type="submit">Save</button>
+</form>
+{% endblock %}

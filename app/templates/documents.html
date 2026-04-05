@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Documents (Event {{ event_id }})</h2>
+<form method="post" enctype="multipart/form-data" class="mb-3">
+  <div class="row g-3 align-items-end">
+    <div class="col-6">
+      <label class="form-label">Document</label>
+      <input type="file" class="form-control" name="document" required>
+    </div>
+    <div class="col-3">
+      <label class="form-label">Type</label>
+      <select name="doc_type" class="form-control">
+        <option value="position_paper">Position Paper</option>
+        <option value="draft_resolution">Draft Resolution</option>
+        <option value="notes">Notes</option>
+      </select>
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-primary" type="submit">Upload</button>
+    </div>
+  </div>
+</form>
+{% if documents %}
+  <ul class="list-group mb-4">
+    {% for d in documents %}
+    <li class="list-group-item d-flex justify-content-between">
+      <span>{{ d.filename }} ({{ d.doc_type }})</span>
+      <a href="/documents/{{ d.id }}/download" class="btn btn-sm btn-outline-secondary">Download</a>
+    </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No documents yet.</p>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Committees</h2>
+<form method="post" class="mb-3">
+  <div class="row g-3 align-items-end">
+    <div class="col">
+      <label class="form-label">Name</label>
+      <input type="text" name="name" class="form-control" required>
+    </div>
+    <div class="col">
+      <label class="form-label">Agenda</label>
+      <input type="text" name="agenda" class="form-control">
+    </div>
+    <div class="col">
+      <label class="form-label">Chair</label>
+      <input type="text" name="chair" class="form-control">
+    </div>
+    <div class="col-auto">
+      <button class="btn btn-primary" type="submit">Add</button>
+    </div>
+  </div>
+</form>
+  <div class="list-group mb-4">
+  {% for c in committees %}
+  <div class="list-group-item">
+    <strong>{{ c.name }}</strong> - Chair: {{ c.chair or 'N/A' }}
+    <div class="text-muted small">Agenda: {{ c.agenda or '' }}</div>
+    <a href="/events/{{ event_id }}/delegates/manage" class="btn btn-sm btn-outline-primary mt-2">Manage Delegates</a>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
