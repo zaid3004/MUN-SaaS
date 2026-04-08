@@ -1,91 +1,191 @@
 {% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
 {% block content %}
-<section class="hero mb-4 animate__animated animate__fadeIn animate__slow">
-  <div>
-    <h1 style="margin:0">MUN SaaS Dashboard</h1>
-    <p class="muted" style="color:var(--muted); margin:6px 0 0;">Centralized event management with elegant visuals</p>
-  </div>
-  <div aria-label="decorative-graphic" style="width:180px; height:120px;">
-    <!-- Simple decorative SVG to convey structure/organization -->
-    <svg viewBox="0 0 180 120" width="100%" height="100%" role="img" aria-label="dashboard-graphic">
-      <defs>
-        <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
-          <stop stop-color="#6c8cff" offset="0"/>
-          <stop stop-color="#22c55e" offset="1"/>
-        </linearGradient>
-      </defs>
-      <rect x="0" y="0" width="180" height="120" fill="url(#lg)" opacity=".08" />
-      <circle cx="40" cy="60" r="12" fill="#6c8cff" />
-      <circle cx="80" cy="60" r="12" fill="#22c55e" />
-      <rect x="110" y="30" width="40" height="60" rx="6" fill="#fff" opacity=".6"/>
-    </svg>
-  </div>
-  <div class="water" aria-label="water-wave" style="width:100%;">
-    <svg class="water-wave" viewBox="0 0 1200 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" style="width:100%; height:100%;">
-      <path d="M0,60 C200,90 400,30 600,60 C800,90 1000,30 1200,60 L1200,120 L0,120 Z" fill="#6c8cff" opacity="0.25"></path>
-    </svg>
-  </div>
-</section>
-
-<div class="row mb-3" aria-label="stats">
-  <div class="col-md-4">
-    <div class="card">
-      <div class="card-body text-center">
-        <div class="stat">{{ events|length or 0 }}</div>
-        <div class="text-muted">Upcoming Events</div>
+<!-- Hero Section with Water Wave -->
+<section class="hero hero-water" style="position: relative; padding: var(--space-16) 0; margin-bottom: var(--space-12); overflow: hidden; border-radius: var(--radius-2xl);">
+  <div class="water-mesh" aria-hidden="true"></div>
+  <div class="container" style="position: relative; z-index: 1;">
+    <div class="row" style="display: grid; grid-template-columns: 1fr; gap: var(--space-8); align-items: center;">
+      <div class="hero-content">
+        <span class="badge badge-primary mb-4 animate__animated animate__fadeInDown" style="animation-duration: 0.8s;">
+          Welcome back
+        </span>
+        <h1 class="animate__animated animate__fadeInUp" style="animation-duration: 0.8s; animation-delay: 0.1s;">
+          Your MUN Hub Awaits
+        </h1>
+        <p class="lead animate__animated animate__fadeInUp" style="animation-duration: 0.8s; animation-delay: 0.2s; max-width: 50ch; margin-top: var(--space-4);">
+          Manage events, coordinate delegates, and streamline your Model United Nations experience with our intuitive platform.
+        </p>
       </div>
-    </div>
-  </div>
-  <div class="col-md-4">
-    <div class="card">
-      <div class="card-body text-center">
-        <div class="stat">{{ (delegates|length) or 0 }}</div>
-        <div class="text-muted">Delegates</div>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-4">
-    <div class="card">
-      <div class="card-body text-center">
-        <div class="stat">{{ (committees|length) or 0 }}</div>
-        <div class="text-muted">Committees</div>
-      </div>
-    </div>
-  </div>
-</div>
-
-{% if announcements and announcements|length > 0 %}
-<div class="card mb-4 border-warning">
-  <div class="card-header bg-warning text-dark">📢 Recent Announcements</div>
-  <div class="list-group list-group-flush">
-    {% for ann in announcements[:3] %}
-    <a href="/events/{{ ann.event_id }}/announcements" class="list-group-item list-group-item-action">
-      <div class="d-flex w-100 justify-content-between">
-        <h6 class="mb-1">{{ ann.title }}</h6>
-        <small>{{ ann.event.name }}</small>
-      </div>
-      <p class="mb-1 text-truncate">{{ ann.content[:100] }}{% if ann.content|length > 100 %}...{% endif %}</p>
-    </a>
-    {% endfor %}
-  </div>
-</div>
-{% endif %}
-
-<div class="row">
-  {% for event in events %}
-  <div class="col-md-4 mb-3 animate__animated animate__fadeInUp" style="animation-delay: {{ loop.index0 * 0.08 }}s;">
-    <div class="card">
-      <div class="card-body">
-        <h5 class="card-title">{{ event.name }}</h5>
-        <p class="card-text">{{ event.description or '' }}</p>
-        <div class="btn-group w-100" role="group">
-          <a href="/events/{{ event.id }}/committees" class="btn btn-sm btn-outline-primary">Committees</a>
-          <a href="/events/{{ event.id }}/announcements" class="btn btn-sm btn-outline-info">Announcements</a>
-          <a href="/events/{{ event.id }}/chat" class="btn btn-sm btn-outline-secondary">Chat</a>
+      <div class="hero-visual animate__animated animate__fadeInRight" style="animation-duration: 1s; animation-delay: 0.3s; position: relative; display: flex; justify-content: center; align-items: center; padding: var(--space-8);">
+        <div style="position: relative; width: 280px; height: 280px; display: flex; align-items: center; justify-content: center;">
+          <!-- Animated Orbs -->
+          <div class="orb" style="position: absolute; width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, rgba(99, 102, 241, 0) 70%); animation: float-orb 8s infinite ease-in-out;"></div>
+          <div class="orb" style="position: absolute; width: 150px; height: 150px; border-radius: 50%; background: radial-gradient(circle, rgba(167, 139, 250, 0.4) 0%, rgba(167, 139, 250, 0) 70%); animation: float-orb 10s infinite ease-in-out reverse;"></div>
+          <div class="orb" style="position: absolute; width: 100px; height: 100px; border-radius: 50%; background: radial-gradient(circle, rgba(99, 102, 241, 0.5) 0%, rgba(99, 102, 241, 0) 70%); animation: float-orb 6s infinite ease-in-out;"></div>
+          <div style="position: relative; z-index: 2; font-size: 4rem; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));">
+            🌍
+          </div>
         </div>
       </div>
     </div>
   </div>
-  {% endfor %}
-</div>
+
+  <!-- Water Wave Decoration -->
+  <div class="wave-container" style="position: absolute; bottom: 0; left: 0; width: 100%; height: 120px;">
+    <div class="wave" style="opacity: 0.3;"></div>
+    <div class="wave" style="opacity: 0.2;"></div>
+  </div>
+</section>
+
+<!-- Stats Grid - Bento Layout -->
+<section class="mb-8">
+  <div class="container">
+    <div class="bento-grid asymmetric">
+      <!-- Events Card -->
+      <div class="card animate-on-scroll water-edge" data-animate="fadeInUp" data-delay="0" data-duration="0.75" style="grid-column: span 1; grid-row: span 1; transition: all var(--duration-normal) var(--ease-out);">
+        <div class="card-body" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+          <div>
+            <div class="text-secondary small mb-2">Active Events</div>
+            <div class="h2 mb-0" style="font-size: 3rem; font-weight: 800; color: var(--color-accent); line-height: 1;">{{ events|length or 0 }}</div>
+          </div>
+          <div class="mt-4">
+            <a href="/events" class="btn btn-primary btn-sm ripple">
+              <span>View All</span>
+              <svg class="icon-circle" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Delegates Card -->
+      <div class="card animate-on-scroll water-edge" data-animate="fadeInUp" data-delay="80" data-duration="0.75" style="grid-column: span 1; grid-row: span 1; background: linear-gradient(135deg, var(--color-surface) 0%, rgba(99, 102, 241, 0.02) 100%);">
+        <div class="card-body" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+          <div>
+            <div class="text-secondary small mb-2">Total Delegates</div>
+            <div class="h2 mb-0" style="font-size: 2.5rem; font-weight: 700; color: var(--color-primary); line-height: 1;">{{ (delegates|length) or 0 }}</div>
+          </div>
+          <div class="mt-4" style="display: flex; align-items: center; gap: var(--space-2);">
+            <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--color-success); box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);"></div>
+            <small style="color: var(--color-secondary);">Active now</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Committees Card -->
+      <div class="card animate-on-scroll water-edge" data-animate="fadeInUp" data-delay="160" data-duration="0.75" style="grid-column: span 1; grid-row: span 1;">
+        <div class="card-body" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+          <div>
+            <div class="text-secondary small mb-2">Committees</div>
+            <div class="h2 mb-0" style="font-size: 2.5rem; font-weight: 700; color: var(--color-highlight); line-height: 1;">{{ (committees|length) or 0 }}</div>
+          </div>
+          <div class="mt-4">
+            <div class="badge badge-success">All operational</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions Card (span-2) -->
+      <div class="card-doppel animate-on-scroll water-edge" data-animate="fadeInUp" data-delay="240" data-duration="0.8" style="grid-column: span 1; grid-row: span 2; background: var(--color-surface); border-radius: var(--radius-2xl); padding: 2px;">
+        <div class="card-doppel-inner" style="height: 100%; padding: var(--space-8);">
+          <div class="card-title mb-6">Quick Actions</div>
+          <div style="display: flex; flex-direction: column; gap: var(--space-4);">
+            <a href="/events" class="btn btn-primary ripple" style="justify-content: flex-start; width: 100%;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+              Create New Event
+            </a>
+            <a href="/events" class="btn btn-secondary ripple" style="justify-content: flex-start; width: 100%;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+              Add Delegate
+            </a>
+            <a href="/documents" class="btn btn-ghost ripple" style="justify-content: flex-start; width: 100%;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="12" y1="18" x2="12" y2="12"/>
+                <line x1="9" y1="15" x2="15" y2="15"/>
+              </svg>
+              Upload Document
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Announcements -->
+      <div class="card animate-on-scroll water-edge" data-animate="fadeInUp" data-delay="320" data-duration="0.75" style="grid-column: span 1; grid-row: span 2; display: flex; flex-direction: column;">
+        <div class="card-header">
+          <div class="card-title mb-0">Latest Announcements</div>
+        </div>
+        <div class="card-body" style="flex: 1; overflow-y: auto; padding: var(--space-6);">
+          {% if announcements and announcements|length > 0 %}
+            {% for ann in announcements[:3] %}
+              <div class="mb-4 pb-4" style="border-bottom: 1px solid var(--color-divider);">
+                <div class="d-flex justify-between items-center mb-2">
+                  <span class="badge badge-primary">{{ ann.event.name }}</span>
+                  <small class="text-secondary">{{ ann.created_at|default('Recent') }}</small>
+                </div>
+                <h5 class="mb-2" style="font-size: 1rem; font-weight: 600;">{{ ann.title }}</h5>
+                <p class="mb-0 small" style="color: var(--color-secondary); font-size: 0.875rem;">{{ ann.content[:100] }}{% if ann.content|length > 100 %}...{% endif %}</p>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="text-center py-8" style="text-align: center; padding: var(--space-8) 0;">
+              <div style="font-size: 3rem; margin-bottom: var(--space-4); opacity: 0.3;">📣</div>
+              <p class="text-secondary">No announcements yet.</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Upcoming Events Feed -->
+      <div class="card animate-on-scroll water-edge" data-animate="fadeInUp" data-delay="400" data-duration="0.75" style="grid-column: span 2; grid-row: span 1;">
+        <div class="card-header">
+          <div class="card-title mb-0">Upcoming Events</div>
+        </div>
+        <div class="card-body" style="padding: var(--space-6);">
+          {% if events %}
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
+              {% for event in events %}
+                <div class="event-card" style="padding: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-lg); transition: all var(--duration-normal) var(--ease-out); cursor: pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='var(--shadow-md)';" onmouseout="this.style.transform='none'; this.style.boxShadow='none';">
+                  <div class="text-accent small mb-2" style="color: var(--color-accent); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">
+                    {{ event.start_date }}
+                  </div>
+                  <h5 style="font-size: 1rem; font-weight: 600; margin-bottom: var(--space-2);">{{ event.name }}</h5>
+                  <p class="small mb-0" style="color: var(--color-secondary); font-size: 0.875rem;">{{ event.description[:70] if event.description else 'No description' }}{% if event.description and event.description|length > 70 %}...{% endif %}</p>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="text-center py-8">
+              <p class="text-secondary">No events scheduled. Create your first event above!</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Orb Float Animation -->
+<style>
+  @keyframes float-orb {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-20px) scale(1.05); }
+  }
+</style>
+
 {% endblock %}

@@ -1,21 +1,151 @@
 {% extends 'base.html' %}
+
+{% block title %}Register{% endblock %}
+
+{% set hide_nav = True %}
+
 {% block content %}
-<h2>Register (Organizer)</h2>
-<form method="post" class="mt-3">
-  <div class="mb-3">
-    <label class="form-label">Name</label>
-    <input type="text" name="name" class="form-control" required>
+<section class="auth-section" style="min-height: calc(100dvh - 200px); display: flex; align-items: center; justify-content: center; padding: var(--space-8) var(--space-4); position: relative; overflow: hidden; background: linear-gradient(180deg, var(--color-background) 0%, rgba(99, 102, 241, 0.03) 100%);">
+
+  <!-- Floating Water Droplets -->
+  <div class="water-droplets" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; opacity: 0.5;">
+    {% for i in range(8) %}
+      <div class="droplet" style="left: {{ (i * 12 + 5) }}%; animation-delay: {{ i * 1.5 }}s; animation-duration: {{ 6 + (i % 3) * 2 }}s;"></div>
+    {% endfor %}
   </div>
-  <div class="mb-3">
-    <label class="form-label">Email</label>
-    <input type="email" name="email" class="form-control" required>
+
+  <div class="container" style="max-width: 560px; position: relative; z-index: 2;">
+    <div class="card animate__animated animate__fadeInUp" style="backdrop-filter: blur(20px); border-width: 2px; box-shadow: var(--shadow-2xl);">
+      <div class="card-body" style="padding: var(--space-10);">
+
+        <!-- Wave Accent Top -->
+        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 8px; background: linear-gradient(90deg, var(--color-accent), var(--color-highlight), var(--color-accent)); transform-origin: left; animation: pulse-wave 4s infinite ease-in-out;"></div>
+
+        <!-- Header -->
+        <div class="text-center mb-8" style="text-align: center; margin-bottom: var(--space-8);">
+          <div style="width: 80px; height: 80px; margin: 0 auto var(--space-4); background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%); border-radius: var(--radius-2xl); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; box-shadow: 0 12px 24px -8px rgba(99, 102, 241, 0.3);">
+            🎓
+          </div>
+          <h1 style="font-size: 1.875rem; font-weight: 700; margin-bottom: var(--space-2); color: var(--color-primary);">Create Organizer Account</h1>
+          <p class="text-secondary" style="color: var(--color-secondary); margin: 0; max-width: 40ch; margin: 0 auto;">Set up your account to start organizing Model UN events</p>
+        </div>
+
+        <!-- Registration Form -->
+        <form method="post" novalidate class="cascade-enter">
+          <div class="row g-3" style="display: grid; grid-template-columns: 1fr; gap: var(--space-3); margin-bottom: var(--space-4);">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="name">Full Name</label>
+              <div style="position: relative;">
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  class="form-control"
+                  placeholder="Jane Doe"
+                  required
+                  style="padding-left: var(--space-12);"
+                >
+                <svg style="position: absolute; left: var(--space-4); top: 50%; transform: translateY(-50%); color: var(--color-secondary); pointer-events: none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="email">Email Address</label>
+              <div style="position: relative;">
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  class="form-control"
+                  placeholder="you@school.edu"
+                  required
+                  autocomplete="email"
+                  style="padding-left: var(--space-12);"
+                >
+                <svg style="position: absolute; left: var(--space-4); top: 50%; transform: translateY(-50%); color: var(--color-secondary); pointer-events: none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                  <polyline points="22,6 12,13 2,6"/>
+                </svg>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="password">Password</label>
+              <div style="position: relative;">
+                <input
+                  type="password"
+                  id="password"
+                  name="password"
+                  class="form-control"
+                  placeholder="Create a strong password"
+                  required
+                  autocomplete="new-password"
+                  style="padding-left: var(--space-12);"
+                >
+                <svg style="position: absolute; left: var(--space-4); top: 50%; transform: translateY(-50%); color: var(--color-secondary); pointer-events: none;" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+              </div>
+              <small style="color: var(--color-secondary); font-size: 0.75rem; margin-top: var(--space-2); display: block;">Minimum 8 characters</small>
+            </div>
+          </div>
+
+          {% if error %}
+            <div class="alert" style="background: rgba(239, 68, 68, 0.08); border-left: 4px solid var(--color-error); color: var(--color-error); padding: var(--space-3) var(--space-4); border-radius: var(--radius-md); margin-bottom: var(--space-4); font-size: 0.875rem;">
+              ⚠️ {{ error }}
+            </div>
+          {% endif %}
+
+          <button type="submit" class="btn btn-primary ripple w-full mb-4" style="width: 100%; font-weight: 600; padding: var(--space-4) var(--space-6); font-size: 1rem; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);">
+            Create Account
+          </button>
+        </form>
+
+        <div class="divider" style="display: flex; align-items: center; margin: var(--space-6) 0; color: var(--color-secondary); font-size: 0.875rem;">
+          <div style="flex: 1; height: 1px; background: var(--color-divider);"></div>
+          <span style="padding: 0 var(--space-4);">or</span>
+          <div style="flex: 1; height: 1px; background: var(--color-divider);"></div>
+        </div>
+
+        <div class="text-center" style="text-align: center;">
+          <p style="margin: 0 0 var(--space-4); color: var(--color-secondary); font-size: 0.875rem;">Already have an account?</p>
+          <a href="/login" class="btn btn-outline-primary ripple" style="border-width: 2px; font-weight: 500;">
+            Sign In Instead
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature List -->
+    <div style="margin-top: var(--space-8); display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: var(--space-4); text-align: center;">
+      <div class="reveal stagger-1">
+        <div style="font-size: 2rem; margin-bottom: var(--space-2);">📅</div>
+        <div class="small" style="font-weight: 500; color: var(--color-primary);">Event Scheduling</div>
+      </div>
+      <div class="reveal stagger-2">
+        <div style="font-size: 2rem; margin-bottom: var(--space-2);">👥</div>
+        <div class="small" style="font-weight: 500; color: var(--color-primary);">Delegate Management</div>
+      </div>
+      <div class="reveal stagger-3">
+        <div style="font-size: 2rem; margin-bottom: var(--space-2);">📄</div>
+        <div class="small" style="font-weight: 500; color: var(--color-primary);">Document Sharing</div>
+      </div>
+      <div class="reveal stagger-4">
+        <div style="font-size: 2rem; margin-bottom: var(--space-2);">💬</div>
+        <div class="small" style="font-weight: 500; color: var(--color-primary);">Live Chat</div>
+      </div>
+    </div>
   </div>
-  <div class="mb-3">
-    <label class="form-label">Password</label>
-    <input type="password" name="password" class="form-control" required>
-  </div>
-  <button class="btn btn-primary" type="submit">Register</button>
-</form>
-{% if error %}<div class="alert alert-danger mt-2">{{ error }}</div>{% endif %}
-<p class="mt-3">Already have an account? <a href="/login">Login</a></p>
+</section>
+
+<style>
+  @keyframes pulse-wave {
+    0%, 100% { transform: scaleX(1); opacity: 0.8; }
+    50% { transform: scaleX(1.1); opacity: 1; }
+  }
+</style>
 {% endblock %}
