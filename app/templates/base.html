@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="MUN SaaS - Modern Model United Nations Management Platform">
-    <title>{% block title %}MUN SaaS{% endblock %} - Model United Nations Management</title>
+    <title>{% block title %}Concordia{% endblock %}</title>
 
     <!-- Google Fonts: Geist + Plus Jakarta Sans as fallback -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -33,10 +33,11 @@
     </style>
   </head>
 
-  <body>
+  <body class="{% block body_class %}{% endblock %}">
     <!-- Grain Texture Overlay -->
     <div class="grain-overlay"></div>
 
+    {% block navbar %}
     <!-- Floating Glass Pill Navigation -->
     <nav class="navbar" style="position: sticky; top: var(--space-4); z-index: 50; margin: 0 auto; max-width: fit-content; margin-top: var(--space-4); background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: var(--shadow-lg); border-radius: var(--radius-full); padding: var(--space-2) var(--space-4); margin-bottom: var(--space-8);">
       <div class="container" style="max-width: 100%; padding: 0; display: flex; align-items: center; justify-content: space-between; gap: var(--space-6);">
@@ -62,9 +63,10 @@
         </div>
       </div>
     </nav>
+    {% endblock %}
 
     <!-- Main Content -->
-    <main style="max-width: 1280px; margin: 0 auto; padding: 0 var(--space-4); position: relative; z-index: 1;">
+    <main class="site-main {% block main_class %}{% endblock %}">
       <!-- Flash Messages -->
       {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -82,17 +84,18 @@
       {% block content %}{% endblock %}
     </main>
 
-    <!-- Footer -->
-    <footer style="max-width: 1280px; margin: var(--space-16) auto 0; padding: var(--space-8) var(--space-4); border-top: 1px solid var(--color-divider); text-align: center; color: var(--color-secondary); font-size: 0.875rem;">
-      <div style="display: flex; flex-direction: column; align-items: center; gap: var(--space-4);">
-        <p style="margin: 0; max-width: none;">© {{ now.year if now else 2025 }} MUN SaaS. Empowering education through technology.</p>
-        <div style="display: flex; gap: var(--space-4);">
-          <a href="#" style="color: var(--color-secondary);">Privacy</a>
-          <a href="#" style="color: var(--color-secondary);">Terms</a>
-          <a href="#" style="color: var(--color-secondary);">Support</a>
+    {% block footer %}
+    <footer class="site-footer">
+      <div class="site-footer-inner">
+        <p class="site-footer-copy">© {{ now.year if now else 2025 }} MUN SaaS. Empowering education through technology.</p>
+        <div class="site-footer-links">
+          <a href="#">Privacy</a>
+          <a href="#">Terms</a>
+          <a href="#">Support</a>
         </div>
       </div>
     </footer>
+    {% endblock %}
 
     <!-- Bootstrap JS Bundle (kept for forms/utilities) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

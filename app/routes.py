@@ -39,8 +39,11 @@ def register():
         name = request.form.get('name')
         email = request.form.get('email')
         password = request.form.get('password')
-        if not all([name, email, password]):
+        password_confirm = request.form.get('password_confirm')
+        if not all([name, email, password, password_confirm]):
             return render_template('register.html', error='All fields are required')
+        if password != password_confirm:
+            return render_template('register.html', error='Passwords do not match')
         # Create Organizer and initial organizer user
         existing = User.query.filter_by(email=email).first()
         if existing:
