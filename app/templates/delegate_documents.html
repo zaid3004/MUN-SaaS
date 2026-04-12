@@ -1,16 +1,32 @@
 {% extends 'base.html' %}
+
+{% block title %}Delegate documents{% endblock %}
+
 {% block content %}
-<h2>Delegate Documents (Delegate {{ delegate_id }})</h2>
-{% if documents %}
-  <ul class="list-group mb-4">
-    {% for d in documents %}
-    <li class="list-group-item d-flex justify-content-between align-items-center">
-      <span>{{ d.filename }} ({{ d.doc_type }})</span>
-      <a href="/documents/{{ d.id }}/download" class="btn btn-sm btn-outline-secondary">Download</a>
-    </li>
-    {% endfor %}
-  </ul>
-{% else %}
-  <p>No documents for this delegate.</p>
-{% endif %}
+<section class="mb-8">
+  <div class="container">
+    <div class="mun-page-head">
+      <div>
+        <span class="badge badge-primary mb-2">Delegate {{ delegate_id }}</span>
+        <h1 class="mun-page-head__title">Documents</h1>
+        <p class="text-secondary mt-2" style="margin-top: var(--space-2); margin-bottom: 0;">Submitted files</p>
+      </div>
+    </div>
+
+    {% if documents %}
+    <ul class="mun-list">
+      {% for d in documents %}
+      <li class="mun-list-item mun-spotlight-card" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-3);">
+        <span style="color: var(--foreground);">{{ d.filename }} <span class="text-secondary" style="font-size: 0.875rem;">({{ d.doc_type }})</span></span>
+        <a href="/documents/{{ d.id }}/download" class="btn btn-sm btn-outline-secondary ripple">Download</a>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="card mun-spotlight-card" style="padding: var(--space-8); text-align: center;">
+      <p class="text-secondary mb-0">No documents for this delegate.</p>
+    </div>
+    {% endif %}
+  </div>
+</section>
 {% endblock %}

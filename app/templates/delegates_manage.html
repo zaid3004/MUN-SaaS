@@ -1,61 +1,86 @@
 {% extends 'base.html' %}
-{% block content %}
-<h2>Manage Delegates (Event {{ event_id }})</h2>
 
-{% for group in grouped %}
-  <div class="card mb-3">
-    <div class="card-header"><strong>{{ group.committee.name }}</strong> (ID: {{ group.committee.id }})</div>
-    <div class="card-body">
+{% block title %}Manage Delegates{% endblock %}
+
+{% block content %}
+<section class="mb-8">
+  <div class="container">
+    <div class="mun-page-head">
+      <div>
+        <span class="badge badge-primary mb-2">Event {{ event_id }}</span>
+        <h1 class="mun-page-head__title">Manage delegates</h1>
+        <p class="text-secondary mt-2" style="margin-top: var(--space-2); margin-bottom: 0;">By committee roster</p>
+      </div>
+      <a href="/events/{{ event_id }}/delegates/export_passwords" class="btn btn-outline-secondary ripple">Export passwords</a>
+    </div>
+  </div>
+</section>
+
+<section class="mb-8">
+  <div class="container">
+    {% for group in grouped %}
+    <div class="card mun-spotlight-card mb-8" style="margin-bottom: var(--space-8); padding: var(--space-6);">
+      <h2 class="h2" style="font-size: 1.2rem; margin-bottom: var(--space-4); color: var(--foreground);">{{ group.committee.name }} <span class="text-secondary" style="font-size: 0.85rem; font-weight: 500;">#{{ group.committee.id }}</span></h2>
+
       {% if group.delegates %}
-      <ul class="list-group mb-3">
+      <ul class="mun-list" style="margin-bottom: var(--space-5);">
         {% for d in group.delegates %}
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-          <span>{{ d.name }} ({{ d.email }}) - {{ d.country }}</span>
-          <a href="/events/{{ event_id }}/delegates/{{ d.id }}/edit" class="btn btn-sm btn-outline-primary">Edit</a>
+        <li class="mun-list-item mun-spotlight-card" style="padding: var(--space-3) var(--space-4);">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-2);">
+            <span style="color: var(--foreground);">{{ d.name }} · {{ d.email }} · {{ d.country or '—' }}</span>
+            <a href="/events/{{ event_id }}/delegates/{{ d.id }}/edit" class="btn btn-sm btn-outline-primary ripple">Edit</a>
+          </div>
         </li>
         {% endfor %}
       </ul>
       {% else %}
-      <p>No delegates in this committee yet.</p>
+      <p class="text-secondary mb-4" style="margin-bottom: var(--space-4);">No delegates in this committee yet.</p>
       {% endif %}
-      <form method="post" class="row g-3 align-items-end" action="/events/{{ event_id }}/delegates">
+
+      <form method="post" action="/events/{{ event_id }}/delegates" class="mun-form-grid" style="border-top: 1px solid var(--border); padding-top: var(--space-5); grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));">
         <input type="hidden" name="committee_id" value="{{ group.committee.id }}">
-        <div class="col">
-          <label class="form-label">Add Delegate</label>
-          <input class="form-control" name="name" placeholder="Name" required>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label" for="name_{{ group.committee.id }}">Name</label>
+          <input class="form-control" id="name_{{ group.committee.id }}" name="name" placeholder="Name" required>
         </div>
-        <div class="col">
-          <input class="form-control" name="email" placeholder="Email" type="email" required>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label" for="email_{{ group.committee.id }}">Email</label>
+          <input class="form-control" id="email_{{ group.committee.id }}" name="email" type="email" placeholder="Email" required>
         </div>
-        <div class="col">
-          <input class="form-control" name="country" placeholder="Country">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label" for="country_{{ group.committee.id }}">Country</label>
+          <input class="form-control" id="country_{{ group.committee.id }}" name="country" placeholder="Country">
         </div>
-        <div class="col-auto">
-          <input class="form-control" name="password" placeholder="Password" required>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label class="form-label" for="password_{{ group.committee.id }}">Password</label>
+          <input class="form-control" id="password_{{ group.committee.id }}" name="password" type="password" placeholder="Password" required>
         </div>
-        <div class="col-auto">
-          <button class="btn btn-primary" type="submit">Add</button>
+        <div class="form-group" style="margin-bottom: 0; align-self: end;">
+          <button class="btn btn-primary ripple" type="submit" style="width: 100%;">Add delegate</button>
         </div>
       </form>
     </div>
-  </div>
-{% endfor %}
-
-<h3>Unassigned Delegates</h3>
-{% if unassigned %}
-  <ul class="list-group mb-3">
-    {% for d in unassigned %}
-    <li class="list-group-item d-flex justify-content-between align-items-center">
-      <span>{{ d.name }} ({{ d.email }}) - {{ d.country }}</span>
-      <a href="/events/{{ event_id }}/delegates/{{ d.id }}/edit" class="btn btn-sm btn-outline-primary">Edit</a>
-    </li>
     {% endfor %}
-  </ul>
-{% else %}
-  <p>No unassigned delegates.</p>
-{% endif %}
 
-<a href="/events/{{ event_id }}/delegates/export_passwords" class="btn btn-outline-secondary">Export All Delegates Passwords</a>
+    <h2 class="h2" style="font-size: 1.15rem; margin: var(--space-8) 0 var(--space-4);">Unassigned delegates</h2>
+    {% if unassigned %}
+    <ul class="mun-list">
+      {% for d in unassigned %}
+      <li class="mun-list-item mun-spotlight-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-2);">
+          <span>{{ d.name }} ({{ d.email }}) — {{ d.country or '—' }}</span>
+          <a href="/events/{{ event_id }}/delegates/{{ d.id }}/edit" class="btn btn-sm btn-outline-primary ripple">Edit</a>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="text-secondary">No unassigned delegates.</p>
+    {% endif %}
 
-<p class="mt-3"><a href="/dashboard">Back to Dashboard</a></p>
+    <p class="mt-8" style="margin-top: var(--space-8);">
+      <a href="/dashboard" class="nav-link" style="display: inline-block; padding-left: 0;">← Back to dashboard</a>
+    </p>
+  </div>
+</section>
 {% endblock %}

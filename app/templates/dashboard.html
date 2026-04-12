@@ -44,11 +44,11 @@
   <div class="container">
     <div class="bento-grid asymmetric">
       <!-- Events Card -->
-      <div class="card animate-on-scroll water-edge" data-animate="fadeInUp" data-delay="0" data-duration="0.75" style="grid-column: span 1; grid-row: span 1; transition: all var(--duration-normal) var(--ease-out);">
+      <div class="card mun-spotlight-card animate-on-scroll water-edge" data-animate="fadeInUp" data-delay="0" data-duration="0.75" style="grid-column: span 1; grid-row: span 1; transition: all var(--duration-normal) var(--ease-out);">
         <div class="card-body" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
           <div>
             <div class="text-secondary small mb-2">Active Events</div>
-            <div class="h2 mb-0" style="font-size: 3rem; font-weight: 800; color: var(--color-accent); line-height: 1;">{{ events|length or 0 }}</div>
+            <div class="h2 mb-0" style="font-size: 3rem; font-weight: 800; color: var(--primary); line-height: 1;">{{ events|length or 0 }}</div>
           </div>
           <div class="mt-4">
             <a href="/events" class="btn btn-primary btn-sm ripple">
@@ -62,29 +62,29 @@
       </div>
 
       <!-- Delegates Card -->
-      <div class="card animate-on-scroll water-edge" data-animate="fadeInUp" data-delay="80" data-duration="0.75" style="grid-column: span 1; grid-row: span 1; background: linear-gradient(135deg, var(--color-surface) 0%, rgba(99, 102, 241, 0.02) 100%);">
+      <div class="card mun-spotlight-card animate-on-scroll water-edge" data-animate="fadeInUp" data-delay="80" data-duration="0.75" style="grid-column: span 1; grid-row: span 1; background: linear-gradient(135deg, var(--color-surface) 0%, color-mix(in srgb, var(--primary) 6%, transparent) 100%);">
         <div class="card-body" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
           <div>
             <div class="text-secondary small mb-2">Total Delegates</div>
             <div class="h2 mb-0" style="font-size: 2.5rem; font-weight: 700; color: var(--color-primary); line-height: 1;">{{ (delegates|length) or 0 }}</div>
           </div>
-          <div class="mt-4" style="display: flex; align-items: center; gap: var(--space-2);">
-            <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--color-success); box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);"></div>
+          <!-- <div class="mt-4" style="display: flex; align-items: center; gap: var(--space-2);">
+            <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--color-success); box-shadow: 0 0 0 4px color-mix(in srgb, var(--chart-4) 18%, transparent);"></div>
             <small style="color: var(--color-secondary);">Active now</small>
-          </div>
+          </div> -->
         </div>
       </div>
 
       <!-- Committees Card -->
-      <div class="card animate-on-scroll water-edge" data-animate="fadeInUp" data-delay="160" data-duration="0.75" style="grid-column: span 1; grid-row: span 1;">
+      <div class="card mun-spotlight-card animate-on-scroll water-edge" data-animate="fadeInUp" data-delay="160" data-duration="0.75" style="grid-column: span 1; grid-row: span 1;">
         <div class="card-body" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
           <div>
             <div class="text-secondary small mb-2">Committees</div>
             <div class="h2 mb-0" style="font-size: 2.5rem; font-weight: 700; color: var(--color-highlight); line-height: 1;">{{ (committees|length) or 0 }}</div>
           </div>
-          <div class="mt-4">
+          <!-- <div class="mt-4">
             <div class="badge badge-success">All operational</div>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -94,7 +94,7 @@
   <div class="container">
     <div class="bento-grid asymmetric">
       <!-- Quick Actions Card (span-2) -->
-      <div class="card-doppel animate-on-scroll water-edge" data-animate="fadeInUp" data-delay="240" data-duration="0.8" style="grid-column: span 1; grid-row: span 2; background: var(--color-surface); border-radius: var(--radius-2xl); padding: 2px;">
+      <div class="card-doppel mun-spotlight-card animate-on-scroll water-edge" data-animate="fadeInUp" data-delay="240" data-duration="0.8" style="grid-column: span 1; grid-row: span 2; background: var(--color-surface); border-radius: var(--radius-2xl); padding: 2px;">
         <div class="card-doppel-inner" style="height: 100%; padding: var(--space-8);">
           <div class="card-title mb-6">Quick Actions</div>
           <div style="display: flex; flex-direction: column; gap: var(--space-4);">
@@ -130,7 +130,7 @@
       </div>
 
       <!-- Recent Announcements -->
-      <div class="card animate-on-scroll water-edge" data-animate="fadeInUp" data-delay="320" data-duration="0.75" style="grid-column: span 1; grid-row: span 2; display: flex; flex-direction: column;">
+      <div class="card mun-spotlight-card animate-on-scroll water-edge" data-animate="fadeInUp" data-delay="320" data-duration="0.75" style="grid-column: span 1; grid-row: span 2; display: flex; flex-direction: column;">
         <div class="card-header">
           <div class="card-title mb-0">Latest Announcements</div>
         </div>
@@ -161,7 +161,7 @@
   <div class="container">
     <div class="bento-grid asymmetric">
       <!-- Upcoming Events Feed -->
-      <div class="card animate-on-scroll water-edge" data-animate="fadeInUp" data-delay="400" data-duration="0.75" style="grid-column: span 2; grid-row: span 1;">
+      <div class="card mun-spotlight-card animate-on-scroll water-edge" data-animate="fadeInUp" data-delay="400" data-duration="0.75" style="grid-column: span 2; grid-row: span 1;">
         <div class="card-header">
           <div class="card-title mb-0">Upcoming Events</div>
         </div>
@@ -169,7 +169,7 @@
           {% if events %}
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
               {% for event in events %}
-                <div class="event-card" style="padding: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-lg); transition: all var(--duration-normal) var(--ease-out); cursor: pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='var(--shadow-md)';" onmouseout="this.style.transform='none'; this.style.boxShadow='none';">
+                <div class="mun-spotlight-card" style="padding: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-lg); cursor: pointer;">
                   <div class="text-accent small mb-2" style="color: var(--color-accent); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">
                     {{ event.start_date }}
                   </div>

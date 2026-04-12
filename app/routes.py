@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, send_file, flash
+from flask import Blueprint, render_template, request, redirect, url_for, session, send_file, flash, jsonify
 from .storage_r2 import upload_to_r2
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -148,10 +148,14 @@ def events():
         description = request.form.get('description')
         organizer_id = session.get('organizer_id')
         if not name:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({'success': False, 'message': 'Name required'})
             return render_template('events.html', error='Name required')
         event = Event(organizer_id=organizer_id, name=name, start_date=start, end_date=end, description=description)
         db.session.add(event)
         db.session.commit()
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': True, 'message': 'Event created successfully'})
         return redirect(url_for('bp.dashboard'))
     events = []
     if session.get('organizer_id'):

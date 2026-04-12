@@ -3,18 +3,17 @@
 {% block title %}Events{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<section class="mb-8" style="margin-bottom: var(--space-8); padding-top: var(--space-4);">
+<section class="mb-8">
   <div class="container">
-    <div class="row align-items-end" style="display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4);">
+    <div class="mun-page-head">
       <div>
         <span class="badge badge-primary mb-2">Management</span>
-        <h1 style="font-size: clamp(2rem, 4vw, 3rem); font-weight: 700; margin: 0; color: var(--color-primary);">Events</h1>
-        <p class="text-secondary mt-2" style="color: var(--color-secondary); margin-top: var(--space-2); max-width: 50ch;">Create and manage Model United Nations conferences and sessions</p>
+        <h1 class="mun-page-head__title">Events</h1>
+        <p class="text-secondary mt-2" style="margin-top: var(--space-2); max-width: 50ch;">Create and manage Model United Nations conferences and sessions</p>
       </div>
       <div>
-        <button class="btn btn-primary ripple" data-bs-toggle="modal" data-bs-target="#createEventModal" style="font-weight: 600;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <button type="button" class="btn btn-primary ripple" data-bs-toggle="modal" data-bs-target="#createEventModal">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <line x1="12" y1="5" x2="12" y2="19"/>
             <line x1="5" y1="12" x2="19" y2="12"/>
           </svg>
@@ -25,128 +24,148 @@
   </div>
 </section>
 
-<!-- Create Event Modal -->
+<!-- Create Event Modal — Split layout -->
 <div class="modal fade" id="createEventModal" tabindex="-1" aria-labelledby="createEventModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content" style="border-radius: var(--radius-xl); border: 1px solid var(--color-border); box-shadow: var(--shadow-2xl);">
-      <div class="modal-header" style="border-bottom: 1px solid var(--color-divider); padding: var(--space-6);">
-        <h5 class="modal-title" id="createEventModalLabel" style="font-size: 1.25rem; font-weight: 600;">Create New Event</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: opacity(0.5);"></button>
+  <div class="modal-dialog mun-modal-dialog modal-dialog-centered">
+    <div class="modal-content mun-modal-split">
+      <div class="mun-modal-split-body">
+
+        <!-- LEFT: Form -->
+        <div class="mun-modal-split__main">
+          <button type="button" class="mun-modal-split__close btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+          <p class="mun-modal-split__eyebrow">New Conference</p>
+          <h2 class="mun-modal-split__title" id="createEventModalLabel">Create an event</h2>
+          <p class="mun-modal-split__lede">Name your session, set the calendar, and give delegates a short brief — everything else builds from here.</p>
+
+          <form id="createEventForm" method="post" action="/events" class="mun-modal-split__form">
+            <div class="form-group">
+              <label class="form-label" for="name">Event name</label>
+              <input type="text" class="form-control" id="name" name="name"
+                placeholder="e.g., Harvard Model UN 2025" required autocomplete="off">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
+              <div class="form-group">
+                <label class="form-label" for="start_date">Start date</label>
+                <input type="date" class="form-control" id="start_date" name="start_date" required style="color-scheme: dark;">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="end_date">End date</label>
+                <input type="date" class="form-control" id="end_date" name="end_date" style="color-scheme: dark;">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="description">Description</label>
+              <textarea class="form-control" id="description" name="description" rows="3"
+                placeholder="Brief description of the event"></textarea>
+            </div>
+          </form>
+
+          <div class="mun-modal-split__actions">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" form="createEventForm" class="btn btn-primary">Create event</button>
+          </div>
+        </div>
+
+        <!-- RIGHT: Decorative panel -->
+        <div class="mun-modal-split__side">
+          <div class="mun-modal-split__side-inner">
+            <p class="mun-modal-split__side-kicker">MUN Platform</p>
+            <h3 class="mun-modal-split__side-headline">Your conference,<br>fully organised.</h3>
+            <p class="mun-modal-split__side-text">From committees to resolutions — manage every moving part of your Model UN in one place.</p>
+            <div class="mun-modal-split__side-mark" aria-hidden="true">🌐</div>
+          </div>
+        </div>
+
       </div>
-      <form method="post" action="/events">
-        <div class="modal-body" style="padding: var(--space-6);">
-          <div class="form-group">
-            <label class="form-label" for="name">Event Name</label>
-            <input type="text" class="form-control" id="name" name="name" placeholder="e.g., Harvard Model UN 2025" required>
-          </div>
-
-          <div class="row g-3 mb-3" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); margin-bottom: var(--space-3);">
-            <div class="form-group" style="margin-bottom: 0;">
-              <label class="form-label" for="start_date">Start Date</label>
-              <input type="date" class="form-control" id="start_date" name="start_date" required style="color-scheme: light;">
-            </div>
-            <div class="form-group" style="margin-bottom: 0;">
-              <label class="form-label" for="end_date">End Date</label>
-              <input type="date" class="form-control" id="end_date" name="end_date" style="color-scheme: light;">
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label class="form-label" for="description">Description</label>
-            <textarea class="form-control" id="description" name="description" rows="4" placeholder="Brief description of the event"></textarea>
-          </div>
-        </div>
-        <div class="modal-footer" style="border-top: 1px solid var(--color-divider); padding: var(--space-6); display: flex; justify-content: flex-end; gap: var(--space-3);">
-          <button type="button" class="btn btn-ghost" data-bs-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-primary ripple">Create Event</button>
-        </div>
-      </form>
     </div>
   </div>
 </div>
 
-<!-- Events List -->
 <section class="mb-8">
   <div class="container">
     {% if events %}
       <div class="bento-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: var(--space-6);">
         {% for e in events %}
-          <div class="card reveal cascade-enter" style="transition: all var(--duration-normal) var(--ease-out); overflow: hidden; position: relative;">
-            <!-- Top Accent -->
-            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, var(--color-accent), var(--color-highlight));"></div>
-
-            <div class="card-body" style="padding: var(--space-6);">
-              <div class="d-flex justify-between items-start mb-4" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-4);">
-                <div class="badge badge-primary" style="font-size: 0.75rem;">
-                  {{ e.start_date }}
-                </div>
+          <div class="card mun-spotlight-card reveal cascade-enter" style="padding: 0; position: relative;">
+            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, var(--primary), var(--accent)); z-index: 1;"></div>
+            <div class="card-body" style="padding: var(--space-6); position: relative; z-index: 1;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-4);">
+                <div class="badge badge-primary" style="font-size: 0.75rem;">{{ e.start_date }}</div>
                 {% if e.end_date %}
-                  <small class="text-secondary" style="color: var(--color-secondary); font-size: 0.875rem;">→ {{ e.end_date }}</small>
+                  <small class="text-secondary" style="font-size: 0.875rem;">→ {{ e.end_date }}</small>
                 {% endif %}
               </div>
-
-              <h3 style="font-size: 1.25rem; font-weight: 700; margin-bottom: var(--space-3); color: var(--color-primary); line-height: 1.3;">
-                {{ e.name }}
-              </h3>
-
+              <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: var(--space-3); color: var(--foreground); line-height: 1.3;">{{ e.name }}</h3>
               {% if e.description %}
-                <p class="text-secondary mb-4" style="color: var(--color-secondary); font-size: 0.9rem; margin-bottom: var(--space-4); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                <p class="text-secondary mb-4" style="font-size: 0.9rem; margin-bottom: var(--space-4); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
                   {{ e.description }}
                 </p>
               {% endif %}
-
-              <!-- Action Buttons -->
-              <div class="mt-auto" style="margin-top: auto; display: flex; gap: var(--space-2); flex-wrap: wrap;">
-                <a href="/events/{{ e.id }}/committees" class="btn btn-outline-primary btn-sm ripple" style="font-weight: 500; padding: var(--space-2) var(--space-4); font-size: 0.875rem;">
-                  Committees
-                </a>
-                <a href="/events/{{ e.id }}/announcements" class="btn btn-outline-secondary btn-sm ripple" style="font-weight: 500; padding: var(--space-2) var(--space-4); font-size: 0.875rem;">
-                  Announcements
-                </a>
-                <a href="/events/{{ e.id }}/chat" class="btn btn-outline-accent btn-sm ripple" style="font-weight: 500; padding: var(--space-2) var(--space-4); font-size: 0.875rem; border-color: var(--color-highlight); color: var(--color-highlight);">
-                  Chat
-                </a>
+              <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
+                <a href="/events/{{ e.id }}/committees" class="btn btn-outline-primary btn-sm ripple">Committees</a>
+                <a href="/events/{{ e.id }}/announcements" class="btn btn-outline-secondary btn-sm ripple">Announcements</a>
+                <a href="/events/{{ e.id }}/chat" class="btn btn-outline-accent btn-sm ripple">Chat</a>
               </div>
             </div>
-
-            <!-- Subtle hover glow -->
-            <div class="hover-glow" style="position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(167, 139, 250, 0.08) 0%, transparent 60%); opacity: 0; transition: opacity var(--duration-normal) var(--ease-out);"></div>
           </div>
         {% endfor %}
       </div>
     {% else %}
-      <!-- Empty State -->
-      <div class="card" style="text-align: center; padding: var(--space-12); background: linear-gradient(135deg, var(--color-surface) 0%, rgba(99, 102, 241, 0.02) 100%);">
-        <div style="font-size: 4rem; margin-bottom: var(--space-4); opacity: 0.3;">📅</div>
-        <h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: var(--space-2); color: var(--color-primary);">No Events Yet</h3>
-        <p class="text-secondary mb-6" style="color: var(--color-secondary); max-width: 40ch; margin: 0 auto var(--space-6);">Create your first Model UN event to get started with managing committees, delegates, and announcements.</p>
-        <button class="btn btn-primary ripple" data-bs-toggle="modal" data-bs-target="#createEventModal" style="font-weight: 600;">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <div class="card mun-spotlight-card" style="text-align: center; padding: var(--space-12); background: linear-gradient(135deg, var(--color-surface) 0%, color-mix(in srgb, var(--primary) 7%, transparent) 100%);">
+        <div style="font-size: 4rem; margin-bottom: var(--space-4); opacity: 0.35;">📅</div>
+        <h3 style="font-size: 1.5rem; font-weight: 600; margin-bottom: var(--space-2); color: var(--foreground);">No events yet</h3>
+        <p class="text-secondary mb-6" style="max-width: 40ch; margin: 0 auto var(--space-6);">Create your first Model UN event to unlock committees, delegates, and announcements.</p>
+        <button type="button" class="btn btn-primary ripple" data-bs-toggle="modal" data-bs-target="#createEventModal">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <line x1="12" y1="5" x2="12" y2="19"/>
             <line x1="5" y1="12" x2="19" y2="12"/>
           </svg>
-          Create First Event
+          Create first event
         </button>
       </div>
     {% endif %}
   </div>
 </section>
-
-<!-- Hover Glow Script -->
-<script>
-  document.querySelectorAll('.card').forEach(card => {
-    card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 100;
-      const y = ((e.clientY - rect.top) / rect.height) * 100;
-      card.style.setProperty('--mouse-x', `${x}%`);
-      card.style.setProperty('--mouse-y', `${y}%`);
-      card.querySelector('.hover-glow').style.opacity = '1';
-    });
-
-    card.addEventListener('mouseleave', () => {
-      card.querySelector('.hover-glow').style.opacity = '0';
-    });
-  });
-</script>
 {% endblock %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const form = document.getElementById('createEventForm');
+  const modalEl = document.getElementById('createEventModal');
+  const modal = new bootstrap.Modal(modalEl);
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+
+    fetch('/events', {
+      method: 'POST',
+      body: formData,
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          modal.hide();
+          form.reset();
+          window.location.reload();
+        } else {
+          alert(data.message || 'An error occurred');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while creating the event');
+      });
+  });
+
+  // Reset form when modal is dismissed
+  modalEl.addEventListener('hidden.bs.modal', function () {
+    form.reset();
+  });
+});
+</script>

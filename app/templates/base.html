@@ -6,10 +6,10 @@
     <meta name="description" content="MUN SaaS - Modern Model United Nations Management Platform">
     <title>{% block title %}Concordia{% endblock %}</title>
 
-    <!-- Google Fonts: Geist + Plus Jakarta Sans as fallback -->
+    <!-- Google Fonts: DM Sans + Space Mono (design tokens) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 
     <!-- Animate.css for entrance + scroll-triggered animations -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" integrity="sha512-c42qTSw/wPZ3/5LBzD+Bw5f7bSF2oxou6wEb+I/lqeaKV5FDIfMvvRp772y4jcJLKuGUOpbJMdg/BTl50fJYAw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -26,40 +26,40 @@
         width: 100%;
         height: 100%;
         pointer-events: none;
-        z-index: 9999;
-        opacity: 0.015;
+        z-index: 1;
+        opacity: 0.02;
         background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
       }
     </style>
   </head>
 
-  <body class="{% block body_class %}{% endblock %}">
+  <body class="mun-app {% block body_class %}{% endblock %}">
     <!-- Grain Texture Overlay -->
     <div class="grain-overlay"></div>
 
     {% block navbar %}
     <!-- Floating Glass Pill Navigation -->
-    <nav class="navbar" style="position: sticky; top: var(--space-4); z-index: 50; margin: 0 auto; max-width: fit-content; margin-top: var(--space-4); background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.5); box-shadow: var(--shadow-lg); border-radius: var(--radius-full); padding: var(--space-2) var(--space-4); margin-bottom: var(--space-8);">
-      <div class="container" style="max-width: 100%; padding: 0; display: flex; align-items: center; justify-content: space-between; gap: var(--space-6);">
-        <a class="brand" href="/dashboard" style="font-weight: 800; font-size: 1.25rem; color: var(--color-primary); text-decoration: none; display: flex; align-items: center; gap: var(--space-2);">
-          <svg width="28" height="28" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <nav class="navbar">
+      <div class="container">
+        <a class="brand" href="/dashboard">
+          <svg width="28" height="28" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <rect width="100" height="100" rx="24" fill="url(#grad)"/>
-            <path d="M30 40 L65 40 L75 50 L75 70 L25 70 L25 50 Z" fill="white" opacity="0.9"/>
-            <circle cx="40" cy="60" r="8" fill="white"/>
+            <path d="M30 40 L65 40 L75 50 L75 70 L25 70 L25 50 Z" fill="var(--primary-foreground)" opacity="0.92"/>
+            <circle cx="40" cy="60" r="8" fill="var(--primary-foreground)"/>
             <defs>
               <linearGradient id="grad" x1="0" y1="0" x2="100" y2="100">
-                <stop offset="0%" stop-color="#6366F1"/>
-                <stop offset="100%" stop-color="#A78BFA"/>
+                <stop offset="0%" stop-color="#ff8a7a"/>
+                <stop offset="100%" stop-color="#ff6f61"/>
               </linearGradient>
             </defs>
           </svg>
           <span>MUN SaaS</span>
         </a>
 
-        <div class="nav-links" style="display: flex; align-items: center; gap: var(--space-4);">
-          <a class="nav-link" href="/dashboard" style="color: var(--color-secondary); font-weight: 500; font-size: 0.9rem; transition: color var(--duration-fast) var(--ease-out); padding: var(--space-2) var(--space-3); border-radius: var(--radius-md);">Dashboard</a>
-          <a class="nav-link" href="/events" style="color: var(--color-secondary); font-weight: 500; font-size: 0.9rem; transition: color var(--duration-fast) var(--ease-out); padding: var(--space-2) var(--space-3); border-radius: var(--radius-md);">Events</a>
-          <a class="nav-link" href="/logout" style="color: var(--color-secondary); font-weight: 500; font-size: 0.9rem; transition: color var(--duration-fast) var(--ease-out); padding: var(--space-2) var(--space-3); border-radius: var(--radius-md);">Logout</a>
+        <div class="nav-links">
+          <a class="nav-link" href="/dashboard">Dashboard</a>
+          <a class="nav-link" href="/events">Events</a>
+          <a class="nav-link" href="/logout">Logout</a>
         </div>
       </div>
     </nav>
@@ -104,6 +104,21 @@
     <script>
       document.addEventListener('DOMContentLoaded', function() {
         const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        if (!prefersReducedMotion) {
+          window.addEventListener('mousemove', function (e) {
+            document.documentElement.style.setProperty('--pointer-x', e.clientX + 'px');
+            document.documentElement.style.setProperty('--pointer-y', e.clientY + 'px');
+          }, { passive: true });
+        }
+
+        document.querySelectorAll('.mun-spotlight-card').forEach(function (card) {
+          card.addEventListener('mousemove', function (e) {
+            var r = card.getBoundingClientRect();
+            card.style.setProperty('--spot-x', (e.clientX - r.left) + 'px');
+            card.style.setProperty('--spot-y', (e.clientY - r.top) + 'px');
+          });
+        });
 
         const observerOptions = {
           root: null,
@@ -167,7 +182,7 @@
           height: ${size}px;
           left: ${x}px;
           top: ${y}px;
-          background: rgba(99, 102, 241, 0.3);
+          background: color-mix(in srgb, var(--primary) 35%, transparent);
           border-radius: 50%;
           transform: scale(0);
           animation: ripple-animation 0.6s ease-out;
