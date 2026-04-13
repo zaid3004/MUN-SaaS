@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@supabase/supabase-js": "^2.103.0",
     "animate.css": "^4.1.1",
     "aos": "^2.3.4"
   }

@@ -1,3 +1,4 @@
+# app/__init__.py
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask import current_app
@@ -7,9 +8,18 @@ import os
 
 def create_app():
     app = Flask(__name__)
-    app.config['SECRET_KEY'] = 'devsecret-key'  # replace in prod
-    # Using SQLite for MVP; swap to PostgreSQL (Supabase/Neon) later without API surface changes
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mun_saas.db'
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'devsecret-key')  # replace in prod
+    
+    # PostgreSQL (Supabase) connection via DATABASE_URL environment variable
+    database_url = os.getenv('DATABASE_URL')
+    if database_url:
+        # Fix psycopg2 URI scheme if needed (Supabase sometimes uses postgres://)
+        if database_url.startswith('postgres://'):
+            database_url = database_url.replace('postgres://', 'postgresql://', 1)
+        app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+    else:
+        # Fallback to SQLite for local development
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///mun_saas.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     # Storage: choose R2 if environment configured
     app.config['STORAGE_BACKEND'] = os.getenv('STORAGE_BACKEND', 'local')

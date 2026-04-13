@@ -1,3 +1,4 @@
+# app/routes.py - Main application routes and logic for the MUN management system
 from flask import Blueprint, render_template, request, redirect, url_for, session, send_file, flash, jsonify
 from .storage_r2 import upload_to_r2
 from datetime import datetime, timedelta

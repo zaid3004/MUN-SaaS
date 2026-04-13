@@ -1,3 +1,4 @@
+# app/models.py - Database models for the MUN management system
 from datetime import datetime
 from . import db
 
