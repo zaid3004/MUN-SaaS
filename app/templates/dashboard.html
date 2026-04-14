@@ -50,6 +50,16 @@
             <div class="text-secondary small mb-2">Active Events</div>
             <div class="h2 mb-0" style="font-size: 3rem; font-weight: 800; color: var(--primary); line-height: 1;">{{ events|length or 0 }}</div>
           </div>
+          {% if events and events|length > 0 %}
+          <div class="mt-4">
+            <a href="/events" class="btn btn-primary btn-sm ripple">
+              <span>Go to Event</span>
+              <svg class="icon-circle" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </a>
+          </div>
+          {% else %}
           <div class="mt-4">
             <a href="/events" class="btn btn-primary btn-sm ripple">
               <span>View All</span>
@@ -58,6 +68,7 @@
               </svg>
             </a>
           </div>
+          {% endif %}
         </div>
       </div>
 
@@ -107,6 +118,7 @@
               </svg>
               Create New Event
             </a>
+            {% if events and events|length > 0 %}
             <a href="/events" class="btn btn-secondary ripple" style="justify-content: flex-start; width: 100%;">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 5px">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
@@ -114,8 +126,20 @@
                 <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
                 <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
               </svg>
-              Add Delegate
+              Add Delegates
             </a>
+            {% else %}
+            <button class="btn btn-secondary ripple" style="justify-content: flex-start; width: 100%; cursor: not-allowed; opacity: 0.6;" disabled>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 5px">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+              No Events Yet
+            </button>
+            {% endif %}
+            {% if delegates and delegates|length > 0 %}
             <a href="/documents" class="btn btn-ghost ripple" style="justify-content: flex-start; width: 100%;">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 5px">
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
@@ -123,8 +147,19 @@
                 <line x1="12" y1="18" x2="12" y2="12"/>
                 <line x1="9" y1="15" x2="15" y2="15"/>
               </svg>
-              Upload Document
+              Upload/View Documents
             </a>
+            {% else %}
+            <button class="btn btn-ghost ripple" style="justify-content: flex-start; width: 100%; cursor: not-allowed; opacity: 0.6;" disabled>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 5px">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+                <line x1="12" y1="18" x2="12" y2="12"/>
+                <line x1="9" y1="15" x2="15" y2="15"/>
+              </svg>
+              No Delegates Yet
+            </button>
+            {% endif %}
           </div>
         </div>
       </div>
@@ -174,7 +209,10 @@
                     {{ event.start_date }}
                   </div>
                   <h5 style="font-size: 1rem; font-weight: 600; margin-bottom: var(--space-2);">{{ event.name }}</h5>
-                  <p class="small mb-0" style="color: var(--color-secondary); font-size: 0.875rem;">{{ event.description[:70] if event.description else 'No description' }}{% if event.description and event.description|length > 70 %}...{% endif %}</p>
+                  <p class="small mb-3" style="color: var(--color-secondary); font-size: 0.875rem;">{{ event.description[:70] if event.description else 'No description' }}{% if event.description and event.description|length > 70 %}...{% endif %}</p>
+                  <a href="/events/{{ event._id }}/manage_events" class="btn btn-primary btn-sm ripple" style="width: 100%;">
+                    <span>Go to Event</span>
+                  </a>
                 </div>
               {% endfor %}
             </div>

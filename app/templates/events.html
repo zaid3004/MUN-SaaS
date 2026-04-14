@@ -105,9 +105,10 @@
                 </p>
               {% endif %}
               <div style="display: flex; gap: var(--space-2); flex-wrap: wrap;">
-                <a href="/events/{{ e.id }}/committees" class="btn btn-outline-primary btn-sm ripple">Committees</a>
-                <a href="/events/{{ e.id }}/announcements" class="btn btn-outline-secondary btn-sm ripple">Announcements</a>
-                <a href="/events/{{ e.id }}/chat" class="btn btn-outline-accent btn-sm ripple">Chat</a>
+                <a href="/events/{{ e._id }}/committees" class="btn btn-outline-primary btn-sm ripple">Committees</a>
+                <a href="/events/{{ e._id }}/announcements" class="btn btn-outline-secondary btn-sm ripple">Announcements</a>
+                <a href="/events/{{ e._id }}/chat" class="btn btn-outline-accent btn-sm ripple">Chat</a>
+                <a href="/events/{{ e._id }}/manage_events" class="btn btn-outline-tertiary btn-sm ripple">Manage Event</a>
               </div>
             </div>
           </div>

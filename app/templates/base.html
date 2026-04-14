@@ -17,6 +17,52 @@
     <!-- Custom Design System -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 
+    <!-- PostHog Analytics -->
+    <script>
+      !function(t,e){}(function(){var e,a,i,p,o,n,r,d,g,s,c,u,l,h,f,v,m,y,p;}(),document.write,
+      "<script type='text/javascript'>"+"!function(t,e){var n=function(t,e){var n=new XMLHttpRequest;n.open('POST','https://app.posthog.com/e/1811446',!0),n.setRequestHeader('Content-type','application/x-www-form-urlencoded'),n.send(t)},a=function(t,e){var a=new Image;a.src='https://app.posthog.com/e/1811446?'+t;},i=function(t,e){return'\\x2f\\x61\\x70\\x69\\x2f\\x73\\x74\\x6f\\x72\\x61\\x67\\x65'===document.referrer||e}(),p=function(){return localStorage.getItem('posthephauth')||[]};o=function(t,e){var n=Math.floor(1e6*Math.random()),a=Date.now();return!i()&&(a+1e4>Date.now()||(n=Math.random().toString(36).substring(7),a=Date.now(),setTimeout(function(){n=localStorage.getItem('posthephauth')||[]},50)))},n=function(){var t=localStorage.getItem('posthog_session');return t=JSON.parse(t),t||(t={},localStorage.setItem('posthog_session',JSON.stringify(t))),t},r=function(){var t=n();return t.identified?null:t.session_id},d=function(t){localStorage.setItem('posthog_session',JSON.stringify(t))},s=function(t,e){var n=r();return n?(n.session_id=t,d(n),!0):!1},c=function(){var t=Math.random().toString(36).substring(7);return s(t,{})},u=function(){var t=localStorage.getItem('posthephauth')||[];return t.push({distinct_id:t.length,time:Date.now()}),localStorage.setItem('posthephauth',JSON.stringify(t)),t},l=function(t,e){var n=r();return n?(n.distinct_id=t,n.identified=!0,d(n),!0):!1},h=function(){var t=p();return t.length>0?t[0].distinct_id:null},f=function(t){var e=document.cookie.match(new RegExp('(^| )ph_phc_'+t+'=([^;]*)(;|$)'));return e?decodeURIComponent(e[2]):null},v=function(t,e){var n=f(t);return n?JSON.parse(n):null},m=function(t,e){var n={$insert_id:t,t:e};return n},y=function(t){return Math.random().toString(36).substring(2,15)},p=function(t){var e=document.createElement('script');e.setAttribute('src','https://app.posthog.com/static/array.js'),e.setAttribute('type','text/javascript'),document.head&&document.head.appendChild(e);};}());
+    </script>
+    <script>
+      var posthog = {
+        init: function(apiKey, config) {
+          this.apiKey = apiKey;
+          this.config = config || {};
+          this.autocapture = this.config.autocapture !== false;
+          this.capture();
+        },
+        capture: function(event, properties) {
+          var distinctId = this.getDistinctId();
+          var data = {
+            event: event || '$pageview',
+            properties: properties || {},
+            distinct_id: distinctId,
+            timestamp: new Date().toISOString()
+          };
+          console.log('[PostHog] Capture:', data);
+          // In production, send to PostHog API
+        },
+        identify: function(distinctId, userProps) {
+          console.log('[PostHog] Identify:', distinctId, userProps);
+          localStorage.setItem('ph_distinct_id', distinctId);
+        },
+        getDistinctId: function() {
+          var id = localStorage.getItem('ph_distinct_id');
+          if (!id) {
+            id = Math.random().toString(36).substring(2, 15);
+            localStorage.setItem('ph_distinct_id', id);
+          }
+          return id;
+        }
+      };
+      
+      // Auto-capture page views
+      if (typeof window !== 'undefined') {
+        window.posthog = posthog;
+        // Initialize with your PostHog API key
+        // posthog.init('YOUR_API_KEY_HERE');
+      }
+    </script>
+
     <style>
       /* Premium Grain Overlay */
       .grain-overlay {

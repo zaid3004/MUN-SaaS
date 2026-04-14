@@ -10,7 +10,7 @@
 <section class="auth-section" aria-labelledby="auth-heading">
   <div class="auth-section-bg water-shimmer" aria-hidden="true"></div>
 
-  <div class="auth-card animate__animated animate__fadeInUp">
+  <div class="auth-card">
     <div class="auth-card-topbar" aria-hidden="true"></div>
     <div class="auth-card-inner">
       <header class="auth-brand">
@@ -22,71 +22,34 @@
       <form method="post" novalidate id="login-form">
         <div class="form-group">
           <label class="form-label" for="email">Email</label>
-          <div class="auth-block-cube auth-block-cube--input">
-            <div class="auth-input-wrap">
-              <span class="auth-input-icon" aria-hidden="true">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-                  <polyline points="22,6 12,13 2,6"/>
-                </svg>
-              </span>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                class="form-control"
-                placeholder="you@school.edu"
-                required
-                autocomplete="email"
-                inputmode="email"
-              >
-            </div>
-            <div class="auth-cube-top" aria-hidden="true"><div class="auth-cube-inner"></div></div>
-            <div class="auth-cube-right" aria-hidden="true"><div class="auth-cube-inner"></div></div>
-            <div class="auth-cube-back" aria-hidden="true"><div class="auth-cube-inner"></div></div>
+          <div class="floating-input-wrapper">
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="form-control"
+              placeholder=" "
+              required
+              autocomplete="email"
+              inputmode="email"
+            >
+            <label for="email">you@school.edu</label>
           </div>
         </div>
 
         <div class="form-group">
           <label class="form-label" for="password">Password</label>
-          <div class="auth-block-cube auth-block-cube--input">
-            <div class="auth-input-wrap">
-              <span class="auth-input-icon" aria-hidden="true">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-                </svg>
-              </span>
-              <input
-                type="password"
-                id="password"
-                name="password"
-                class="form-control form-control--has-action"
-                placeholder="••••••••"
-                required
-                autocomplete="current-password"
-              >
-              <button
-                type="button"
-                class="auth-input-action"
-                id="password-toggle"
-                aria-label="Show password"
-                aria-pressed="false"
-                data-auth-password-toggle
-              >
-                <svg class="auth-icon-eye" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                  <circle cx="12" cy="12" r="3"/>
-                </svg>
-                <svg class="auth-icon-eye-off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
-                  <line x1="1" y1="1" x2="23" y2="23"/>
-                </svg>
-              </button>
-            </div>
-            <div class="auth-cube-top" aria-hidden="true"><div class="auth-cube-inner"></div></div>
-            <div class="auth-cube-right" aria-hidden="true"><div class="auth-cube-inner"></div></div>
-            <div class="auth-cube-back" aria-hidden="true"><div class="auth-cube-inner"></div></div>
+          <div class="floating-input-wrapper">
+            <input
+              type="password"
+              id="password"
+              name="password"
+              class="form-control"
+              placeholder=" "
+              required
+              autocomplete="current-password"
+            >
+            <label for="password">••••••••</label>
           </div>
         </div>
 
@@ -110,9 +73,6 @@
         </div>
 
         <button type="submit" class="auth-cube-submit ripple">
-          <span class="auth-cube-top" aria-hidden="true"><span class="auth-cube-inner"></span></span>
-          <span class="auth-cube-right" aria-hidden="true"><span class="auth-cube-inner"></span></span>
-          <span class="auth-cube-back" aria-hidden="true"><span class="auth-cube-inner"></span></span>
           <span class="auth-cube-btn-label">Sign in</span>
         </button>
       </form>
@@ -122,9 +82,6 @@
       <div class="auth-footer">
         <p>New to MUN SaaS?</p>
         <a href="/register" class="auth-cube-submit auth-cube-submit--outline ripple">
-          <span class="auth-cube-top" aria-hidden="true"><span class="auth-cube-inner"></span></span>
-          <span class="auth-cube-right" aria-hidden="true"><span class="auth-cube-inner"></span></span>
-          <span class="auth-cube-back" aria-hidden="true"><span class="auth-cube-inner"></span></span>
           <span class="auth-cube-btn-label">Create account</span>
         </a>
       </div>
@@ -134,16 +91,20 @@
 
 <script>
 (function () {
-  document.querySelectorAll('[data-auth-password-toggle]').forEach(function (btn) {
-    var id = btn.getAttribute('data-auth-password-target') || 'password';
-    var input = document.getElementById(id);
-    if (!input) return;
-
-    btn.addEventListener('click', function () {
-      var show = input.type === 'password';
-      input.type = show ? 'text' : 'password';
-      btn.setAttribute('aria-pressed', show ? 'true' : 'false');
-      btn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+  // Add ripple effect to buttons
+  document.querySelectorAll('.ripple').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      var ripple = document.createElement('span');
+      var rect = btn.getBoundingClientRect();
+      var x = e.clientX - rect.left;
+      var y = e.clientY - rect.top;
+      ripple.style.cssText = 'position:absolute;width:20px;height:20px;background:rgba(255,255,255,0.4);border-radius:50%;transform:translate(-50%,-50%) scale(0);left:' + x + 'px;top:' + y + 'px;pointer-events:none;';
+      btn.appendChild(ripple);
+      ripple.animate([
+        { transform: 'translate(-50%,-50%) scale(0)', opacity: 1 },
+        { transform: 'translate(-50%,-50%) scale(4)', opacity: 0 }
+      ], { duration: 600, easing: 'ease-out' });
+      setTimeout(function() { ripple.remove(); }, 600);
     });
   });
 })();
