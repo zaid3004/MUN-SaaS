@@ -4,7 +4,13 @@ import os
 from datetime import datetime
 
 from flask import Flask
-from posthog import Posthog
+
+try:
+    from posthog import Posthog
+
+    HAS_POSTHOG = True
+except ImportError:
+    HAS_POSTHOG = False
 
 posthog_client = None
 
@@ -17,13 +23,16 @@ def create_app():
 
     app.config["STORAGE_BACKEND"] = os.getenv("STORAGE_BACKEND", "local")
 
-    # Initialize PostHog
-    posthog_client = Posthog(
-        os.getenv("POSTHOG_PROJECT_TOKEN", ""),
-        host=os.getenv("POSTHOG_HOST", "https://us.i.posthog.com"),
-        enable_exception_autocapture=True,
-    )
-    atexit.register(posthog_client.shutdown)
+    # Initialize PostHog if available
+    if HAS_POSTHOG:
+        posthog_token = os.getenv("POSTHOG_PROJECT_TOKEN", "")
+        if posthog_token:
+            posthog_client = Posthog(
+                posthog_token,
+                host=os.getenv("POSTHOG_HOST", "https://us.i.posthog.com"),
+                enable_exception_autocapture=True,
+            )
+            atexit.register(posthog_client.shutdown)
 
     @app.template_filter("timestamp_to_date")
     def timestamp_to_date(timestamp):

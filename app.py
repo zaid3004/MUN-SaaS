@@ -1,9 +1,8 @@
-# app.py
-from app import create_app
-import os
+# app.py - Vercel entry point
+from flask_app import create_app
 
 app = create_app()
 
-if __name__ == '__main__':
-    port = int(os.getenv('PORT', 5000))
-    app.run(debug=True, host='0.0.0.0', port=port)
+import os
+
+port = int(os.getenv("PORT", 5000))
