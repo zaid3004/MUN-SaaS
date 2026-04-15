@@ -1927,3 +1927,98 @@ textarea.form-control { min-height: 6rem; resize: vertical; }
 @supports not selector(:has(*)) {
   body .site-main--auth { min-height: 100dvh; }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   OVERDRIVE: Animated Counters
+   ═══════════════════════════════════════════════════════════════ */
+.stat-counter {
+  font-variant-numeric: tabular-nums;
+  will-change: content;
+}
+
+.stat-counter::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--card) 0%, transparent 100%);
+  opacity: 0;
+  animation: counter-glow 0.6s ease-out forwards;
+}
+
+@keyframes counter-glow {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   OVERDRIVE: Instant Search Filter
+   ═══════════════════════════════════════════════════════════════ */
+[data-instant-filter] {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+[data-instant-filter]:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ring) 20%, transparent);
+}
+
+.delegates-list {
+  transition: opacity 0.15s ease;
+}
+
+.delegates-list > li {
+  transition: transform 0.25s var(--ease-out), 
+              opacity 0.2s ease,
+              background-color 0.2s ease;
+}
+
+/* Hide elements that don't match filter */
+.delegates-list > li[data-filter-target="false"],
+[data-filter-target]:not([data-filter-target*="true"]) {
+  display: none;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   OVERDRIVE: Card Staggered Entrance
+   ═══════════════════════════════════════════════════════════════ */
+@keyframes card-entrance {
+  0% {
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+  }
+  60% {
+    transform: translateY(-4px) scale(1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.card-stagger-enter {
+  animation: card-entrance 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.card-stagger-enter:nth-child(1) { animation-delay: 0ms; }
+.card-stagger-enter:nth-child(2) { animation-delay: 60ms; }
+.card-stagger-enter:nth-child(3) { animation-delay: 120ms; }
+.card-stagger-enter:nth-child(4) { animation-delay: 180ms; }
+.card-stagger-enter:nth-child(5) { animation-delay: 240ms; }
+.card-stagger-enter:nth-child(6) { animation-delay: 300ms; }
+
+/* ═══════════════════════════════════════════════════════════════
+   OVERDRIVE: List Item Inline Edit Mode
+   ═══════════════════════════════════════════════════════════════ */
+.mun-list-item.editing {
+  background: color-mix(in srgb, var(--primary) 8%, var(--card));
+  border-color: var(--primary);
+}
+
+.action-buttons {
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.mun-list-item:hover .action-buttons {
+  opacity: 1;
+}

@@ -100,6 +100,163 @@
     <!-- Bootstrap JS Bundle (kept for forms/utilities) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
+    <!-- Overdrive: Animated Counters + Virtual Scroll -->
+    <script>
+      // ═══════════════════════════════════════════════════════════════
+      // OVERDRIVE: Animated Number Counters (Web Animations API)
+      // ═══════════════════════════════════════════════════════════════
+      function animateCounter(el, target, duration) {
+        const start = 0;
+        const startTime = performance.now();
+        const isFloat = target % 1 !== 0;
+        
+        function update(currentTime) {
+          const elapsed = currentTime - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          // Ease out expo for dramatic count
+          const eased = 1 - Math.pow(1 - progress, 4);
+          const current = start + (target - start) * eased;
+          el.textContent = isFloat ? current.toFixed(1) : Math.round(current);
+          
+          if (progress < 1) {
+            requestAnimationFrame(update);
+          } else {
+            el.textContent = isFloat ? target : target;
+          }
+        }
+        requestAnimationFrame(update);
+      }
+
+      // Observe counter elements and animate when visible
+      const counterObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          const el = entry.target;
+          const target = parseFloat(el.dataset.countTo);
+          const duration = parseInt(el.dataset.duration || '1500', 10);
+          
+          // Stagger by index if multiple counters
+          const idx = parseInt(el.dataset.counterIndex || '0', 10);
+          setTimeout(() => {
+            animateCounter(el, target, duration);
+          }, idx * 120);
+          
+          counterObserver.unobserve(el);
+        });
+      }, { threshold: 0.5 });
+
+      document.querySelectorAll('[data-count-to]').forEach((el, i) => {
+        el.dataset.counterIndex = i;
+        counterObserver.observe(el);
+      });
+
+      // ═══════════════════════════════════════════════════════════════
+      // OVERDRIVE: Virtual Scroll for Large Lists
+      // ═══════════════════════════════════════════════════════════════
+      class VirtualScroll {
+        constructor(container, options = {}) {
+          this.container = container;
+          this.itemHeight = options.itemHeight || 72;
+          this.itemBuffer = options.itemBuffer || 5;
+          this.renderFn = options.renderFn || (() => '');
+          this.data = [];
+          this.visibleStart = 0;
+          this.visibleEnd = 0;
+          this.scrollTop = 0;
+          this.containerHeight = 0;
+          
+          this.init();
+        }
+        
+        init() {
+          this.containerHeight = this.container.clientHeight;
+          
+          this.container.addEventListener('scroll', () => this.onScroll(), { passive: true });
+          this.update();
+        }
+        
+        setData(data) {
+          this.data = data;
+          this.container.style.height = (this.data.length * this.itemHeight) + 'px';
+          this.update();
+        }
+        
+        onScroll() {
+          this.scrollTop = this.container.scrollTop;
+          this.update();
+        }
+        
+        update() {
+          const startIdx = Math.max(0, Math.floor(this.scrollTop / this.itemHeight) - this.itemBuffer);
+          const visibleCount = Math.ceil(this.containerHeight / this.itemHeight) + (this.itemBuffer * 2);
+          const endIdx = Math.min(this.data.length, startIdx + visibleCount);
+          
+          if (startIdx === this.visibleStart && endIdx === this.visibleEnd) return;
+          
+          this.visibleStart = startIdx;
+          this.visibleEnd = endIdx;
+          
+          this.render();
+        }
+        
+        render() {
+          const html = [];
+          const spacerHeight = this.visibleStart * this.itemHeight;
+          
+          for (let i = this.visibleStart; i < this.visibleEnd; i++) {
+            html.push(this.renderFn(this.data[i], i));
+          }
+          
+          this.container.innerHTML = (
+            '<div style="height:' + spacerHeight + 'px;"></div>' +
+            html.join('') +
+            '<div style="height:' + ((this.data.length - this.visibleEnd) * this.itemHeight) + 'px;"></div>'
+          );
+        }
+      }
+
+      // Auto-initialize virtual scroll containers
+      document.querySelectorAll('[data-virtual-scroll]').forEach(el => {
+        const data = JSON.parse(el.dataset.delegates || '[]');
+        const itemHeight = parseInt(el.dataset.itemHeight || '72', 10);
+        
+        const virtual = new VirtualScroll(el, {
+          itemHeight: itemHeight,
+          renderFn: (item, idx) => {
+            return `<li class="mun-list-item mun-spotlight-card" style="height:${itemHeight}px;display:flex;align-items:center;">
+              <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:var(--space-3);width:100%;">
+                <div>
+                  <strong style="color:var(--foreground);">${item.name || ''}</strong>
+                  <span class="text-secondary" style="margin-left:var(--space-2);">${item.email || ''}</span>
+                  <div class="mun-list-item__meta" style="margin-top:var(--space-1);">${item.country || '—'} · ${item.committee || 'No committee'}</div>
+                </div>
+                <div style="display:flex;flex-wrap:wrap;gap:var(--space-2);">
+                  <a href="/events/${item.event_id}/delegates/${item.id}/documents" class="btn btn-sm btn-outline-secondary ripple">Docs</a>
+                  <a href="/events/${item.event_id}/delegates/${item.id}/edit" class="btn btn-sm btn-outline-success ripple">Edit</a>
+                </div>
+              </div>
+            </li>`;
+          }
+        });
+        
+        virtual.setData(data);
+        el.dataset.virtualScroll = 'initialized';
+      });
+
+      // Overdrive: Search filter with instant results
+      document.querySelectorAll('[data-instant-filter]').forEach(input => {
+        input.addEventListener('input', () => {
+          const query = input.value.toLowerCase();
+          const targets = document.querySelectorAll('[data-filter-target]');
+          
+          targets.forEach(el => {
+            const text = el.textContent.toLowerCase();
+            el.style.display = text.includes(query) ? '' : 'none';
+          });
+        });
+      });
+    </script>
+
     <!-- Scroll: .reveal (CSS transition) + .animate-on-scroll (Animate.css) -->
     <script>
       document.addEventListener('DOMContentLoaded', function() {
