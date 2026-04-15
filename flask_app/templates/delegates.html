@@ -7,7 +7,7 @@
   <div class="container">
     <div class="mun-page-head">
       <div>
-        <span class="badge badge-primary mb-2">Event {{ event_id }}</span>
+        <span class="badge badge-primary mb-2">{{ event.name if event else event_id }}</span>
         <h1 class="mun-page-head__title">Delegates</h1>
         <p class="text-secondary mt-2" style="margin-top: var(--space-2); margin-bottom: 0;">Roster, credentials, and committee placement</p>
       </div>

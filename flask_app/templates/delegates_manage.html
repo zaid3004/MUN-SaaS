@@ -7,11 +7,15 @@
   <div class="container">
     <div class="mun-page-head">
       <div>
-        <span class="badge badge-primary mb-2">Event {{ event_id }}</span>
+        <span class="badge badge-primary mb-2">{% if event %}{{ event.name }}{% else %}Event {{ event_id }}{% endif %}</span>
         <h1 class="mun-page-head__title">Manage delegates</h1>
-        <p class="text-secondary mt-2" style="margin-top: var(--space-2); margin-bottom: 0;">By committee roster</p>
+        <p class="text-secondary mt-2" style="margin-top: var(--space-2); margin-bottom: 0;"></p>
       </div>
+      {% if delegates and delegates|length > 0 %}
       <a href="/events/{{ event_id }}/delegates/export_passwords" class="btn btn-outline-secondary ripple">Export passwords</a>
+      {% else %}
+      <button class="btn btn-outline-secondary ripple" disabled style="opacity: 0.5; cursor: not-allowed;">Export passwords</button>
+      {% endif %}
     </div>
   </div>
 </section>

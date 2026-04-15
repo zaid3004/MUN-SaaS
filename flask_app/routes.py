@@ -385,11 +385,42 @@ def manage_delegates(event_id):
         or []
     )
 
+    delegate_assignments = (
+        convex_client.query("/api/getDelegatesByEvent", {"eventId": str(event_id)})
+        or []
+    )
+    all_delegates = convex_client.query("/api/getAllDelegates") or []
+
+    delegates = []
+    for assignment in delegate_assignments:
+        user_id = assignment.get("userId")
+        for user in all_delegates:
+            if str(user.get("_id") or user.get("id")) == str(user_id):
+                committee_id = assignment.get("committeeId")
+                committee_name = ""
+                if committee_id:
+                    for c in committees:
+                        if str(c.get("_id") or c.get("id")) == str(committee_id):
+                            committee_name = c.get("name")
+                            break
+                delegates.append(
+                    {
+                        "name": user.get("name"),
+                        "email": user.get("email"),
+                        "country": user.get("country"),
+                        "id": user.get("_id") or user.get("id"),
+                        "committee": committee_name,
+                        "committee_id": committee_id,
+                    }
+                )
+                break
+
     return render_template(
         "delegates_manage.html",
         event_id=event_id,
         committees=committees,
         committee_id=committee_id,
+        delegates=delegates,
     )
 
 
