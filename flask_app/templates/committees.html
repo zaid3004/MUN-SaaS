@@ -81,7 +81,7 @@
                     </p>
                   {% endif %}
                 </div>
-                <div class="badge badge-primary" style="font-size: 0.7rem;">{{ event_id }}</div>
+                <div class="badge badge-primary" style="font-size: 0.7rem;">{{ event.name if event else event_id }}</div>
               </div>
               {% if c.agenda %}
                 <div class="mb-4 pb-4" style="margin-bottom: var(--space-4); padding-bottom: var(--space-4); border-bottom: 1px solid var(--border);">

@@ -373,6 +373,26 @@ def delegates(event_id):
     )
 
 
+@bp.route("/events/<event_id>/delegates/manage", methods=["GET", "POST"])
+def manage_delegates(event_id):
+    if "user_id" not in session:
+        return redirect(url_for("bp.login"))
+
+    committee_id = request.args.get("committee_id")
+
+    committees = (
+        convex_client.query("/api/getCommitteesByEvent", {"eventId": str(event_id)})
+        or []
+    )
+
+    return render_template(
+        "delegates_manage.html",
+        event_id=event_id,
+        committees=committees,
+        committee_id=committee_id,
+    )
+
+
 @bp.route("/events/<event_id>/delegates/export_passwords")
 def export_delegate_passwords(event_id):
     if "user_id" not in session or session.get("role") != "organizer":
