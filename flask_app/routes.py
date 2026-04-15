@@ -254,21 +254,20 @@ def committees(event_id):
 
     if request.method == "POST":
         name = request.form.get("name")
-        agenda = request.form.get("agenda") or None
-        chair = request.form.get("chair") or None
-        co_chair = request.form.get("co_chair") or None
+        agenda = request.form.get("agenda")
+        chair = request.form.get("chair")
+        co_chair = request.form.get("co_chair")
+
+        args = {"eventId": str(event_id), "name": name}
+        if agenda:
+            args["agenda"] = agenda
+        if chair:
+            args["chair"] = chair
+        if co_chair:
+            args["coChair"] = co_chair
 
         try:
-            convex_client.mutation(
-                "/api/createCommittee",
-                {
-                    "eventId": str(event_id),
-                    "name": name,
-                    "agenda": agenda,
-                    "chair": chair,
-                    "coChair": co_chair,
-                },
-            )
+            convex_client.mutation("/api/createCommittee", args)
         except Exception as e:
             flash(f"Error creating committee: {e}", "error")
 
