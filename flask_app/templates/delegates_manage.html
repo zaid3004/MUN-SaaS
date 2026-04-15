@@ -148,7 +148,9 @@
         </form>
       </div>
     </div>
+    <hr style="border: none; border-top: 1px solid var(--border); margin: var(--space-2) 0;">
     {% endfor %}
+    <br>
 
     <h2 class="h2" style="font-size: 1.15rem; margin: var(--space-8) 0 var(--space-4);">Unassigned delegates</h2>
     {% if unassigned %}
@@ -179,7 +181,6 @@ document.addEventListener('DOMContentLoaded', function() {
       var committeeId = this.dataset.committee;
       var content = document.querySelector('.committee-content[data-committee="' + committeeId + '"]');
       var chevron = this.querySelector('.chevron');
-      var isOpen = content.style.display !== 'none';
       
       document.querySelectorAll('.committee-content').forEach(function(c) {
         c.style.display = 'none';
@@ -188,14 +189,10 @@ document.addEventListener('DOMContentLoaded', function() {
         ch.style.transform = 'rotate(0deg)';
       });
       
-      if (!isOpen) {
-        content.style.display = 'block';
-        chevron.style.transform = 'rotate(180deg)';
-      }
+      content.style.display = 'block';
+      chevron.style.transform = 'rotate(180deg)';
     });
   });
-  
-  document.querySelector('.committee-toggle').click();
 });
 </script>
 {% endblock %}
