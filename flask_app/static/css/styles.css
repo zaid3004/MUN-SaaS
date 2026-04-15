@@ -8,45 +8,46 @@
   --pointer-x: 50vw;
   --pointer-y: 50vh;
 
-  /* --- Global dark theme + neon coral primary --- */
-  --background: #000000;
-  --foreground: #f0f0f0;
-  --card: #121212;
-  --card-foreground: #ececec;
-  --popover: #161616;
-  --popover-foreground: #ececec;
-  --muted: #1a1a1a;
-  --muted-foreground: #9ca3af;
-  --border: #2e2e2e;
-  --input: #2a2a2a;
-  --ring: #ff8f82;
+  /* --- Light Mode + Blue primary (#3F8AD8) --- */
+  --background: #FFFFFF;
+  --foreground: #000000;
+  --card: #3F5273;
+  --card-foreground: #FFFFFF;
+  --popover: #3F5273;
+  --popover-foreground: #FFFFFF;
+  --muted: #f5f5f5;
+  --muted-foreground: #000000;
+  --border: #e5e5e5;
+  --input: #f5f5f5;
+  --ring: #3F8AD8;
   --radius: 0px;
-  /* Neon coral — main CTA / brand */
-  --primary: #ff6f61;
-  --primary-foreground: #0a0a0a;
-  --secondary: #facc15;
-  --secondary-foreground: #0a0a0a;
-  --accent: #2dd4bf;
-  --accent-foreground: #0a0a0a;
-  --destructive: #f87171;
-  --destructive-foreground: #0a0a0a;
-  --chart-1: #ff6f61;
-  --chart-2: #facc15;
-  --chart-3: #2dd4bf;
+  --sage: #8b9474;
+  /* Blue — main CTA / brand */
+  --primary: #3F8AD8;
+  --primary-foreground: #FFFFFF;
+  --secondary: #000000;
+  --secondary-foreground: #FFFFFF;
+  --accent: #3F8AD8;
+  --accent-foreground: #FFFFFF;
+  --destructive: #dc2626;
+  --destructive-foreground: #FFFFFF;
+  --chart-1: #3F8AD8;
+  --chart-2: #000000;
+  --chart-3: #60a5fa;
   --chart-4: #4ade80;
   --chart-5: #c084fc;
-  --sidebar: #0a0a0a;
-  --sidebar-foreground: #f0f0f0;
-  --sidebar-primary: #ff6f61;
-  --sidebar-primary-foreground: #0a0a0a;
-  --sidebar-accent: #2dd4bf;
-  --sidebar-accent-foreground: #0a0a0a;
-  --sidebar-border: #2e2e2e;
-  --sidebar-ring: #ff8f82;
+  --sidebar: #3F5273;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-primary: #3F8AD8;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #000000;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #4a5568;
+  --sidebar-ring: #3F8AD8;
   --font-mono: "Space Mono", ui-monospace, monospace;
   --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
   --shadow-blur: 0px;
-  --shadow-color: hsl(0 0% 0%);
+  --shadow-color: rgba(0, 0, 0, 0.1);
   --shadow-spread: 0px;
   --shadow-opacity: 0.85;
   --shadow-offset-x: 4px;
@@ -452,6 +453,18 @@ code, .text-mono {
   color: var(--foreground);
 }
 
+.btn-sage {
+  background: var(--sage);
+  color: var(--chart-4-foreground, #000);
+  box-shadow: 0 4px 28px color-mix(in srgb, var(--chart-4) 38%, transparent);
+}
+.btn-sage-outline {
+  background: transparent;
+  color: var(--sage);
+  border: 1px solid var(--sage);
+  box-shadow: none;
+}
+
 .btn-sm {
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
@@ -565,7 +578,7 @@ code, .text-mono {
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: var(--foreground);
+  color: var(--background);
 }
 
 /* ─── Water Animations ───────────────────────────────────────────────────── */
@@ -740,6 +753,7 @@ body:has(.site-main--auth) {
   align-items: center;
   gap: var(--space-2);
 }
+.brand:hover { color: var(--background); }
 
 .nav-links {
   display: flex;
@@ -748,15 +762,15 @@ body:has(.site-main--auth) {
 }
 
 .nav-link {
-  color: var(--muted-foreground);
+  color: var(--secondary);
   font-weight: 500;
   font-size: 0.9rem;
-  text-decoration: none;
+  text-decoration: underline;
   transition: color var(--duration-fast) var(--ease-out);
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-md);
 }
-.nav-link:hover { color: var(--primary); }
+.nav-link:hover { color: var(--background); }
 
 /* ─── Modals ─────────────────────────────────────────────────────────────
    Bootstrap provides JS show/hide. We fully own the visual layer.
@@ -1848,15 +1862,19 @@ textarea.form-control { min-height: 6rem; resize: vertical; }
   color: var(--chart-4);
   border: 1px solid color-mix(in srgb, var(--chart-4) 28%, transparent);
 }
+.badge-sage {
+  background: color-mix(in srgb, var(--sage) 14%, transparent);
+  color: var(--sage);
+  border: 1px solid color-mix(in srgb, var(--sage) 100%, transparent);
+}
 
-.text-secondary { color: var(--muted-foreground); }
 
 .hero-water {
   background: linear-gradient(
     165deg,
-    color-mix(in srgb, var(--primary) 8%, var(--background)) 0%,
-    var(--background) 42%,
-    color-mix(in srgb, var(--accent) 6%, var(--background)) 100%
+    color-mix(in srgb, var(--primary) 80%, var(--background)) 25%,
+    var(--background) 67%,
+    color-mix(in srgb, var(--accent) 45%, var(--background)) 80%
   );
   border: 1px solid var(--border);
 }
@@ -2007,6 +2025,21 @@ textarea.form-control { min-height: 6rem; resize: vertical; }
 .card-stagger-enter:nth-child(6) { animation-delay: 300ms; }
 
 /* ═══════════════════════════════════════════════════════════════
+   Text Carousel Animation
+   ═══════════════════════════════════════════════════════════════ */
+@keyframes text-carousel {
+  0%, 20% { transform: translateY(0); }
+  25%, 45% { transform: translateY(calc(-1 * 52px)); }
+  50%, 70% { transform: translateY(calc(-2 * 52px)); }
+  75%, 95% { transform: translateY(calc(-3 * 52px)); }
+  100% { transform: translateY(calc(-3 * 52px)); }
+}
+
+.carousel-inner:hover {
+  animation-play-state: paused;
+}
+
+/* ═══════════════════════════════════════════════════════════════
    OVERDRIVE: List Item Inline Edit Mode
    ═══════════════════════════════════════════════════════════════ */
 .mun-list-item.editing {
@@ -2022,3 +2055,4 @@ textarea.form-control { min-height: 6rem; resize: vertical; }
 .mun-list-item:hover .action-buttons {
   opacity: 1;
 }
+

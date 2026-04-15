@@ -7,7 +7,7 @@
   <div class="container">
     <div class="mun-page-head">
       <div>
-        <span class="badge badge-primary mb-2">Management</span>
+        <span class="badge badge-sage mb-2">Management</span>
         <h1 class="mun-page-head__title">Events</h1>
         <p class="text-secondary mt-2" style="margin-top: var(--space-2); max-width: 50ch;">Create and manage Model United Nations conferences and sessions</p>
       </div>
@@ -34,37 +34,37 @@
         <div class="mun-modal-split__main">
           <button type="button" class="mun-modal-split__close btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 
-          <p class="mun-modal-split__eyebrow">New Conference</p>
-          <h2 class="mun-modal-split__title" id="createEventModalLabel">Create an event</h2>
-          <p class="mun-modal-split__lede">Name your session, set the calendar, and give delegates a short brief — everything else builds from here.</p>
+          <p class="mun-modal-split__eyebrow" style="color: white;">New Conference</p>
+          <h2 class="mun-modal-split__title" id="createEventModalLabel" style="color: white;">Create an event</h2>
+          <p class="mun-modal-split__lede" style="color: white;">Name your session, set the calendar, and give delegates a short brief — everything else builds from here.</p>
 
           <form id="createEventForm" method="post" action="/events" class="mun-modal-split__form">
             <div class="form-group">
-              <label class="form-label" for="name">Event name</label>
+              <label class="form-label" for="name" style="color: white;">Event name</label>
               <input type="text" class="form-control" id="name" name="name"
-                placeholder="e.g., Harvard Model UN 2025" required autocomplete="off">
+                placeholder="e.g., Harvard Model UN 2025" required autocomplete="off" style="outline: rgba(99, 102, 241, 0.5) solid 2px;">
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
               <div class="form-group">
-                <label class="form-label" for="start_date">Start date</label>
+                <label class="form-label" for="start_date" style="color: white;">Start date</label>
                 <input type="date" class="form-control" id="start_date" name="start_date" required style="color-scheme: dark;">
               </div>
               <div class="form-group">
-                <label class="form-label" for="end_date">End date</label>
+                <label class="form-label" for="end_date" style="color: white;">End date</label>
                 <input type="date" class="form-control" id="end_date" name="end_date" style="color-scheme: dark;">
               </div>
             </div>
 
             <div class="form-group">
-              <label class="form-label" for="description">Description</label>
+              <label class="form-label" for="description" style="color: white;">Description</label>
               <textarea class="form-control" id="description" name="description" rows="3"
                 placeholder="Brief description of the event"></textarea>
             </div>
           </form>
 
           <div class="mun-modal-split__actions">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-sage-outline" data-bs-dismiss="modal">Cancel</button>
             <button type="submit" form="createEventForm" class="btn btn-primary">Create event</button>
           </div>
         </div>
@@ -72,9 +72,9 @@
         <!-- RIGHT: Decorative panel -->
         <div class="mun-modal-split__side">
           <div class="mun-modal-split__side-inner">
-            <p class="mun-modal-split__side-kicker">MUN Platform</p>
-            <h3 class="mun-modal-split__side-headline">Your conference,<br>fully organised.</h3>
-            <p class="mun-modal-split__side-text">From committees to resolutions — manage every moving part of your Model UN in one place.</p>
+            <p class="mun-modal-split__side-kicker" style="color: var(--secondary);">MUN Platform</p>
+            <h3 class="mun-modal-split__side-headline" style="color: var(--secondary);">Your conference,<br>fully organised.</h3>
+            <p class="mun-modal-split__side-text" style="color: var(--secondary);">From committees to resolutions — manage every moving part of your Model UN in one place.</p>
             <div class="mun-modal-split__side-mark" aria-hidden="true">🌐</div>
           </div>
         </div>

@@ -52,13 +52,19 @@ Clean, functional, clearly communicates purpose.
 
 ## Visual Identity Requirements
 
-### Color Palette (Current - Can Evolve)
-- Background: `#0d0d0d` (near-black)
-- Card: `#161618` (dark gray)
-- Primary: `#ff6f61` (warm coral/salmon)
-- Accent: `#6366f1` (indigo)
-- Text: `#fafafa` (off-white)
-- Muted: `#71717a` (gray)
+### Color Palette (Official)
+- Primary (CTAs, accents, active states, logo mark): `#3F8AD8` (Blue)
+- Card/Panel Backgrounds (featured pricing, CTA sections): `#3F5273` (Navy)
+- Section Labels, Country Tags, Supporting Text: `#8B9474` (Sage)
+- Typography: `#000000` (Black)
+- Page Background: `#FFFFFF` (White)
+
+### Light Mode Design
+- Background: `#FFFFFF`
+- Card: `#3F5273` (Navy - for featured cards)
+- Primary: `#3F8AD8` (Blue)
+- Text: `#000000`
+- Muted/Supporting: `#8B9474` (Sage)
 
 ### Typography
 - **Headings**: DM Sans - Bold, clean
