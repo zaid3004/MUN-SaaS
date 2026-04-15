@@ -111,13 +111,11 @@ http.route({
   method: "POST",
   handler: httpAction(async (ctx, request) => {
     const { organizerId, name, startDate, endDate, description } = await request.json();
-    const eventId = await ctx.runMutation(internal.api.createEvent, {
-      organizerId,
-      name,
-      startDate,
-      endDate,
-      description,
-    });
+    const args: any = { organizerId, name };
+    if (startDate !== null && startDate !== undefined) args.startDate = startDate;
+    if (endDate !== null && endDate !== undefined) args.endDate = endDate;
+    if (description !== null && description !== undefined && description !== "") args.description = description;
+    const eventId = await ctx.runMutation(internal.api.createEvent, args);
     return new Response(JSON.stringify({ eventId }), {
       headers: { "Content-Type": "application/json" },
     });
@@ -141,13 +139,11 @@ http.route({
   method: "POST",
   handler: httpAction(async (ctx, request) => {
     const { eventId, name, agenda, chair, coChair } = await request.json();
-    const committeeId = await ctx.runMutation(internal.api.createCommittee, {
-      eventId,
-      name,
-      agenda,
-      chair,
-      coChair,
-    });
+    const args: any = { eventId, name };
+    if (agenda !== null && agenda !== undefined && agenda !== "") args.agenda = agenda;
+    if (chair !== null && chair !== undefined && chair !== "") args.chair = chair;
+    if (coChair !== null && coChair !== undefined && coChair !== "") args.coChair = coChair;
+    const committeeId = await ctx.runMutation(internal.api.createCommittee, args);
     return new Response(JSON.stringify({ committeeId }), {
       headers: { "Content-Type": "application/json" },
     });
@@ -227,13 +223,9 @@ http.route({
   method: "POST",
   handler: httpAction(async (ctx, request) => {
     const { eventId, title, content, createdBy, isPinned } = await request.json();
-    const announcementId = await ctx.runMutation(internal.api.createAnnouncement, {
-      eventId,
-      title,
-      content,
-      createdBy,
-      isPinned,
-    });
+    const args: any = { eventId, title, content, createdBy };
+    if (isPinned !== null && isPinned !== undefined) args.isPinned = isPinned;
+    const announcementId = await ctx.runMutation(internal.api.createAnnouncement, args);
     return new Response(JSON.stringify({ announcementId }), {
       headers: { "Content-Type": "application/json" },
     });
