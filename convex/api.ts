@@ -124,8 +124,9 @@ export const createEvent = mutation({
     startDate: v.optional(v.number()),
     endDate: v.optional(v.number()),
     description: v.optional(v.string()),
+    plan: v.optional(v.string()),
   },
-  handler: async (ctx, { organizerId, name, startDate, endDate, description }) => {
+  handler: async (ctx, { organizerId, name, startDate, endDate, description, plan }) => {
     const eventId = await ctx.db.insert("events", {
       organizerId,
       name,
@@ -133,7 +134,58 @@ export const createEvent = mutation({
       endDate,
       description,
       createdAt: Date.now(),
+      isPaid: false,
+      plan: plan || "small",
+      stripeSessionId: undefined,
+      stripePaymentIntentId: undefined,
+      expiresAt: undefined,
+      delegateCount: 0,
     });
+    return eventId;
+  },
+});
+
+export const updateEventPayment = mutation({
+  args: {
+    eventId: v.string(),
+    stripeSessionId: v.string(),
+    stripePaymentIntentId: v.optional(v.string()),
+    plan: v.string(),
+    expiresAt: v.number(),
+  },
+  handler: async (ctx, { eventId, stripeSessionId, stripePaymentIntentId, plan, expiresAt }) => {
+    await ctx.db.patch(eventId as any, {
+      isPaid: true,
+      stripeSessionId,
+      stripePaymentIntentId,
+      plan,
+      expiresAt,
+    });
+    return eventId;
+  },
+});
+
+export const getEventPaymentStatus = query({
+  args: { eventId: v.string() },
+  handler: async (ctx, { eventId }) => {
+    const event = await ctx.db.get(eventId as any);
+    if (!event) return { isPaid: false, plan: "small", expiresAt: undefined };
+    return {
+      isPaid: event.isPaid || false,
+      plan: event.plan || "small",
+      expiresAt: event.expiresAt,
+      delegateCount: event.delegateCount || 0,
+    };
+  },
+});
+
+export const updateEventDelegateCount = mutation({
+  args: {
+    eventId: v.string(),
+    count: v.number(),
+  },
+  handler: async (ctx, { eventId, count }) => {
+    await ctx.db.patch(eventId as any, { delegateCount: count });
     return eventId;
   },
 });

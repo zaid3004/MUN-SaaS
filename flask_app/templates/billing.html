@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}Billing - MUN SaaS{% endblock %}
+
+{% block content %}
+<section class="mb-8">
+  <div class="container">
+    <div class="mun-page-head">
+      <div>
+        <span class="badge badge-primary mb-2">Event {{ event.name }}</span>
+        <h1 class="mun-page-head__title">Billing & Plans</h1>
+        <p class="text-secondary mt-2" style="margin-top: var(--space-2); margin-bottom: 0;">Manage your event subscription</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if request.args.get('success') %}
+<div class="container" style="margin-bottom: var(--space-6);">
+  <div class="alert alert-success" style="padding: var(--space-4); background: color-mix(in srgb, var(--success) 15%, transparent); border: 1px solid var(--success); border-radius: var(--radius-lg);">
+    <strong>Payment successful!</strong> Your event is now active.
+  </div>
+</div>
+{% endif %}
+
+{% if request.args.get('canceled') %}
+<div class="container" style="margin-bottom: var(--space-6);">
+  <div class="alert alert-warning" style="padding: var(--space-4); background: color-mix(in srgb, var(--warning) 15%, transparent); border: 1px solid var(--warning); border-radius: var(--radius-lg);">
+    Payment was canceled. You can try again below.
+  </div>
+</div>
+{% endif %}
+
+<section class="mb-8">
+  <div class="container">
+    <div class="card mun-spotlight-card" style="padding: var(--space-6);">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4);">
+        <div>
+          <h2 class="h2" style="font-size: 1.25rem; margin: 0; color: var(--foreground);">Current Plan</h2>
+          <p class="text-secondary" style="margin-top: var(--space-2);">{{ pricing[plan].name }} - {{ delegate_count }} / {{ max_delegates }} delegates</p>
+        </div>
+        <div>
+          {% if is_paid %}
+          <span class="badge badge-success" style="background: var(--success); color: white; padding: var(--space-2) var(--space-3); border-radius: var(--radius-md);">Active</span>
+          {% else %}
+          <span class="badge badge-warning" style="background: var(--warning); color: var(--background); padding: var(--space-2) var(--space-3); border-radius: var(--radius-md);">Unpaid</span>
+          {% endif %}
+        </div>
+      </div>
+      
+      {% if not is_paid %}
+      <div style="background: color-mix(in srgb, var(--primary) 10%, transparent); padding: var(--space-4); border-radius: var(--radius-lg); margin-bottom: var(--space-6);">
+        <p class="text-secondary">Complete payment to unlock all features. Your event is currently restricted.</p>
+      </div>
+      {% endif %}
+      
+      <h3 class="h3" style="font-size: 1rem; margin-bottom: var(--space-4); color: var(--foreground);">Choose a Plan</h3>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6);">
+        {% for plan_key, plan_info in pricing.items() %}
+        <div class="card {% if plan == plan_key %}mun-spotlight-card{% else %}mun-card{% endif %}" style="padding: var(--space-5); border: 2px solid {% if plan == plan_key %}var(--primary){% else %}var(--border){% endif %}; border-radius: var(--radius-xl);">
+          {% if plan_key == 'medium' %}
+          <span class="badge badge-primary" style="position: absolute; top: calc(var(--space-3) * -1); right: var(--space-3);">Popular</span>
+          {% endif %}
+          
+          <h4 style="font-size: 1.1rem; font-weight: 600; color: var(--foreground); margin-bottom: var(--space-2);">{{ plan_info.name }}</h4>
+          <div style="font-size: 1.75rem; font-weight: 700; color: var(--primary); margin-bottom: var(--space-3);">AED {{ plan_info.price }}</div>
+          <p class="text-secondary" style="font-size: 0.9rem; margin-bottom: var(--space-4);">Up to {{ plan_info.max_delegates }} delegates</p>
+          
+          <form method="post" action="{{ url_for('bp.billing', event_id=event_id) }}">
+            <input type="hidden" name="plan" value="{{ plan_key }}">
+            <input type="hidden" name="is_upgrade" value="{% if plan != 'small' and plan_key in ['medium', 'large'] %}true{% else %}false{% endif %}">
+            <input type="hidden" name="current_plan" value="{{ plan }}">
+            <button type="submit" class="btn {% if plan == plan_key %}btn-primary{% else %}btn-outline-primary{% endif %} ripple" style="width: 100%;" {% if plan == plan_key %}disabled{% endif %}>
+              {% if plan == plan_key %}
+              Current
+              {% elif plan_key in ['medium', 'large'] and plan == 'small' %}
+              Upgrade
+              {% else %}
+              Select
+              {% endif %}
+            </button>
+          </form>
+        </div>
+        {% endfor %}
+      </div>
+      
+      <div style="border-top: 1px solid var(--border); padding-top: var(--space-6);">
+        <h4 style="font-size: 1rem; font-weight: 600; color: var(--foreground); margin-bottom: var(--space-4);">Plan Features</h4>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-3);">
+          <div style="display: flex; align-items: center; gap: var(--space-2);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            <span class="text-secondary" style="font-size: 0.9rem;">Delegate management</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: var(--space-2);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            <span class="text-secondary" style="font-size: 0.9rem;">Unlimited committees</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: var(--space-2);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            <span class="text-secondary" style="font-size: 0.9rem;">Document sharing</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: var(--space-2);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            <span class="text-secondary" style="font-size: 0.9rem;">Announcements</span>
+          </div>
+          {% if plan in ['medium', 'large'] %}
+          <div style="display: flex; align-items: center; gap: var(--space-2);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            <span class="text-secondary" style="font-size: 0.9rem;">Committee chat rooms</span>
+          </div>
+          {% endif %}
+          {% if plan == 'large' %}
+          <div style="display: flex; align-items: center; gap: var(--space-2);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            <span class="text-secondary" style="font-size: 0.9rem;">Advanced analytics</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: var(--space-2);">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            <span class="text-secondary" style="font-size: 0.9rem;">Exportable reports</span>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <div style="margin-top: var(--space-6);">
+      <a href="{{ url_for('bp.dashboard') }}" class="btn btn-outline-secondary ripple">← Back to Dashboard</a>
+    </div>
+  </div>
+</section>
+{% endblock %}

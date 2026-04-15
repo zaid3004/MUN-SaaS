@@ -11,6 +11,14 @@ from flask import (
     jsonify,
 )
 from .convex_client import convex_client
+from .stripe_utils import (
+    create_checkout_session,
+    verify_payment,
+    PRICING,
+    calculate_price,
+    calculate_upgrade_price,
+    construct_webhook_event,
+)
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
@@ -35,6 +43,51 @@ def login_required(role=None):
         return wrapper
 
     return decorator
+
+
+def check_event_access(event_id):
+    """Check if event is paid and not expired. Returns (can_access, error_message)."""
+    if not event_id:
+        return False, "Event not found"
+
+    try:
+        status = convex_client.query(
+            "/api/getEventPaymentStatus", {"eventId": str(event_id)}
+        )
+        if not status:
+            return False, "Event not found"
+
+        if not status.get("isPaid"):
+            return False, "unpaid"
+
+        expires_at = status.get("expiresAt")
+        if expires_at and expires_at < datetime.utcnow().timestamp() * 1000:
+            return False, "expired"
+
+        return True, None
+    except:
+        return False, "error"
+
+
+def check_delegate_limit(event_id, current_count):
+    """Check if delegate count is within plan limits. Returns (can_add, message)."""
+    try:
+        status = convex_client.query(
+            "/api/getEventPaymentStatus", {"eventId": str(event_id)}
+        )
+        if not status:
+            return False, "Event not found"
+
+        plan = status.get("plan", "small")
+        delegate_count = status.get("delegateCount", 0)
+        max_delegates = PRICING.get(plan, {}).get("max_delegates", 100)
+
+        if current_count >= max_delegates:
+            return False, f"limit_reached"
+
+        return True, None
+    except:
+        return True, None
 
 
 @bp.route("/")
@@ -171,6 +224,20 @@ def dashboard():
     )
     events = events or []
 
+    unpaid_event_id = None
+    for event in events:
+        status = convex_client.query(
+            "/api/getEventPaymentStatus",
+            {"eventId": str(event.get("_id") or event.get("id"))},
+        )
+        if status and not status.get("isPaid"):
+            unpaid_event_id = str(event.get("_id") or event.get("id"))
+            flash(
+                f'Event "{event.get("name")}" requires payment. Please complete billing.',
+                "warning",
+            )
+            break
+
     # Get announcements for these events
     announcements = []
     for event in events:
@@ -189,6 +256,7 @@ def dashboard():
         announcements=announcements,
         delegates=[],
         committees=[],
+        unpaid_event_id=unpaid_event_id,
     )
 
 
@@ -228,13 +296,18 @@ def events():
                     "startDate": start,
                     "endDate": end,
                     "description": description,
+                    "plan": "small",
                 },
             )
             if request.headers.get("X-Requested-With") == "XMLHttpRequest":
                 return jsonify(
-                    {"success": True, "message": "Event created successfully"}
+                    {
+                        "success": True,
+                        "message": "Event created successfully",
+                        "eventId": str(event_id),
+                    }
                 )
-            return redirect(url_for("bp.dashboard"))
+            return redirect(url_for("bp.billing", event_id=str(event_id)))
         except Exception as e:
             if request.headers.get("X-Requested-With") == "XMLHttpRequest":
                 return jsonify({"success": False, "message": str(e)})
@@ -251,6 +324,17 @@ def events():
 def committees(event_id):
     if "user_id" not in session:
         return redirect(url_for("bp.login"))
+
+    can_access, error = check_event_access(event_id)
+    if not can_access:
+        if error == "unpaid":
+            return redirect(url_for("bp.billing", event_id=event_id))
+        elif error == "expired":
+            flash("Event has expired. Please renew.", "error")
+            return redirect(url_for("bp.billing", event_id=event_id))
+        else:
+            flash("Access denied", "error")
+            return redirect(url_for("bp.dashboard"))
 
     if request.method == "POST":
         name = request.form.get("name")
@@ -325,6 +409,17 @@ def delegates(event_id):
     if "user_id" not in session:
         return redirect(url_for("bp.login"))
 
+    can_access, error = check_event_access(event_id)
+    if not can_access:
+        if error == "unpaid":
+            return redirect(url_for("bp.billing", event_id=event_id))
+        elif error == "expired":
+            flash("Event has expired. Please renew.", "error")
+            return redirect(url_for("bp.billing", event_id=event_id))
+        else:
+            flash("Access denied", "error")
+            return redirect(url_for("bp.dashboard"))
+
     if request.method == "POST":
         name = request.form.get("name")
         email = request.form.get("email")
@@ -360,6 +455,15 @@ def delegates(event_id):
                         "committeeId": str(committee_id),
                     },
                 )
+
+            new_count = len(delegate_assignments) + 1
+            convex_client.mutation(
+                "/api/updateEventDelegateCount",
+                {
+                    "eventId": str(event_id),
+                    "count": new_count,
+                },
+            )
         except Exception as e:
             flash(f"Error creating delegate: {e}", "error")
 
@@ -414,6 +518,17 @@ def delegates(event_id):
 def manage_delegates(event_id):
     if "user_id" not in session:
         return redirect(url_for("bp.login"))
+
+    can_access, error = check_event_access(event_id)
+    if not can_access:
+        if error == "unpaid":
+            return redirect(url_for("bp.billing", event_id=event_id))
+        elif error == "expired":
+            flash("Event has expired. Please renew.", "error")
+            return redirect(url_for("bp.billing", event_id=event_id))
+        else:
+            flash("Access denied", "error")
+            return redirect(url_for("bp.dashboard"))
 
     committee_id = request.args.get("committee_id")
 
@@ -615,6 +730,17 @@ def chat(event_id):
     if "user_id" not in session:
         return redirect(url_for("bp.login"))
 
+    can_access, error = check_event_access(event_id)
+    if not can_access:
+        if error == "unpaid":
+            return redirect(url_for("bp.billing", event_id=event_id))
+        elif error == "expired":
+            flash("Event has expired. Please renew.", "error")
+            return redirect(url_for("bp.billing", event_id=event_id))
+        else:
+            flash("Access denied", "error")
+            return redirect(url_for("bp.dashboard"))
+
     if request.method == "POST":
         text = request.form.get("message")
         if text:
@@ -643,63 +769,16 @@ def announcements(event_id):
     if "user_id" not in session:
         return redirect(url_for("bp.login"))
 
-    user_role = session.get("role")
-    can_post = user_role in ["organizer", "chair", "co_chair"]
-
-    if request.method == "POST" and can_post:
-        title = request.form.get("title")
-        content = request.form.get("content")
-        is_pinned = request.form.get("is_pinned") == "on"
-
-        if title and content:
-            try:
-                convex_client.mutation(
-                    "/api/createAnnouncement",
-                    {
-                        "eventId": str(event_id),
-                        "title": title,
-                        "content": content,
-                        "createdBy": str(session.get("user_id")),
-                        "isPinned": is_pinned,
-                    },
-                )
-                flash("Announcement created successfully", "success")
-            except Exception as e:
-                flash(f"Error creating announcement: {e}", "error")
-
-        return redirect(url_for("bp.announcements", event_id=event_id))
-
-    announcements_list = (
-        convex_client.query("/api/getAnnouncementsByEvent", {"eventId": str(event_id)})
-        or []
-    )
-    announcements_list.sort(
-        key=lambda x: (not x.get("isPinned", False), x.get("createdAt", 0)),
-        reverse=True,
-    )
-
-    return render_template(
-        "announcements.html",
-        announcements=announcements_list,
-        event_id=event_id,
-        can_post=can_post,
-    )
-
-
-@bp.route("/events/<event_id>/documents", methods=["GET", "POST"])
-def documents(event_id):
-    if "user_id" not in session:
-        return redirect(url_for("bp.login"))
-
-    # Note: Document upload requires storage integration
-    # For now, just render the page
-    return render_template("documents.html", documents=[], event_id=event_id)
-
-
-@bp.route("/events/<event_id>/manage_events", methods=["GET", "POST"])
-def manage_events(event_id):
-    if "user_id" not in session:
-        return redirect(url_for("bp.login"))
+    can_access, error = check_event_access(event_id)
+    if not can_access:
+        if error == "unpaid":
+            return redirect(url_for("bp.billing", event_id=event_id))
+        elif error == "expired":
+            flash("Event has expired. Please renew.", "error")
+            return redirect(url_for("bp.billing", event_id=event_id))
+        else:
+            flash("Access denied", "error")
+            return redirect(url_for("bp.dashboard"))
 
     if request.method == "POST":
         action = request.form.get("action")
@@ -761,3 +840,143 @@ def delete_announcement(announcement_id):
     # Need to implement delete mutation
     flash("Announcement deleted", "success")
     return redirect(url_for("bp.dashboard"))
+
+
+@bp.route("/events/<event_id>/billing", methods=["GET", "POST"])
+def billing(event_id):
+    if "user_id" not in session:
+        return redirect(url_for("bp.login"))
+
+    event = convex_client.query("/api/getEventById", {"id": str(event_id)})
+    if not event:
+        flash("Event not found", "error")
+        return redirect(url_for("bp.dashboard"))
+
+    status = (
+        convex_client.query("/api/getEventPaymentStatus", {"eventId": str(event_id)})
+        or {}
+    )
+    is_paid = status.get("isPaid", False)
+    plan = status.get("plan", "small")
+    delegate_count = status.get("delegateCount", 0)
+
+    if request.method == "POST":
+        selected_plan = request.form.get("plan")
+        is_upgrade = request.form.get("is_upgrade") == "true"
+        current_plan = request.form.get("current_plan", plan)
+
+        site_url = os.getenv("CONVEX_SITE_URL", "https://mun-saas.com")
+        success_url = f"{site_url}/events/{event_id}/billing?success=true&session_id={{CHECKOUT_SESSION_ID}}"
+        cancel_url = f"{site_url}/events/{event_id}/billing?canceled=true"
+
+        user = convex_client.query(
+            "/api/getUserById", {"id": str(session.get("user_id"))}
+        )
+
+        checkout_url = create_checkout_session(
+            user_email=user.get("email") if user else "",
+            user_name=user.get("name") if user else "",
+            event_id=str(event_id),
+            event_name=event.get("name", ""),
+            plan=selected_plan,
+            success_url=success_url,
+            cancel_url=cancel_url,
+            is_upgrade=is_upgrade,
+            current_plan=current_plan,
+            delegate_count=delegate_count,
+        )
+
+        if checkout_url:
+            return redirect(checkout_url)
+        elif is_upgrade:
+            flash("You're already on this plan or a higher plan", "info")
+        else:
+            flash(
+                "Event created but payment skipped. Please complete payment.", "warning"
+            )
+            return redirect(url_for("bp.billing", event_id=event_id))
+
+    max_delegates = PRICING.get(plan, {}).get("max_delegates", 100)
+    can_upgrade = plan != "large"
+
+    return render_template(
+        "billing.html",
+        event=event,
+        event_id=event_id,
+        is_paid=is_paid,
+        plan=plan,
+        delegate_count=delegate_count,
+        max_delegates=max_delegates,
+        pricing=PRICING,
+        can_upgrade=can_upgrade,
+    )
+
+
+@bp.route("/events/<event_id>/billing/success")
+def billing_success(event_id):
+    if "user_id" not in session:
+        return redirect(url_for("bp.login"))
+
+    session_id = request.args.get("session_id")
+    if not session_id:
+        flash("Invalid session", "error")
+        return redirect(url_for("bp.billing", event_id=event_id))
+
+    verification = verify_payment(session_id)
+    if not verification.get("paid"):
+        flash("Payment not verified", "error")
+        return redirect(url_for("bp.billing", event_id=event_id))
+
+    event = convex_client.query("/api/getEventById", {"id": str(event_id)})
+    if not event:
+        flash("Event not found", "error")
+        return redirect(url_for("bp.dashboard"))
+
+    plan = request.args.get("plan", "small")
+    expires_at = int((datetime.utcnow() + timedelta(days=90)).timestamp() * 1000)
+
+    convex_client.mutation(
+        "/api/updateEventPayment",
+        {
+            "eventId": str(event_id),
+            "stripeSessionId": session_id,
+            "stripePaymentIntentId": "",
+            "plan": plan,
+            "expiresAt": expires_at,
+        },
+    )
+
+    flash("Payment successful! Your event is now active.", "success")
+    return redirect(url_for("bp.billing", event_id=event_id))
+
+
+@bp.route("/webhook/stripe", methods=["POST"])
+def stripe_webhook():
+    payload = request.get_data()
+    signature = request.headers.get("Stripe-Signature")
+
+    event = construct_webhook_event(payload, signature)
+    if not event:
+        return jsonify({"error": "Invalid webhook"}), 400
+
+    if event.get("type") == "checkout.session.completed":
+        data = event.get("data", {}).get("object", {})
+        event_id = data.get("metadata", {}).get("event_id")
+        plan = data.get("metadata", {}).get("plan", "small")
+
+        if event_id:
+            expires_at = int(
+                (datetime.utcnow() + timedelta(days=90)).timestamp() * 1000
+            )
+            convex_client.mutation(
+                "/api/updateEventPayment",
+                {
+                    "eventId": event_id,
+                    "stripeSessionId": data.get("id", ""),
+                    "stripePaymentIntentId": data.get("payment_intent", ""),
+                    "plan": plan,
+                    "expiresAt": expires_at,
+                },
+            )
+
+    return jsonify({"success": True}), 200

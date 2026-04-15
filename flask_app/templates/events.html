@@ -153,7 +153,11 @@ document.addEventListener('DOMContentLoaded', function () {
         if (data.success) {
           modal.hide();
           form.reset();
-          window.location.reload();
+          if (data.eventId) {
+            window.location.href = '/events/' + data.eventId + '/billing';
+          } else {
+            window.location.reload();
+          }
         } else {
           alert(data.message || 'An error occurred');
         }

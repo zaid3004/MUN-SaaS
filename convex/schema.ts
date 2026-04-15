@@ -25,6 +25,12 @@ export default defineSchema({
     endDate: v.optional(v.number()),
     description: v.optional(v.string()),
     createdAt: v.number(),
+    isPaid: v.boolean(),
+    plan: v.optional(v.string()),
+    stripeSessionId: v.optional(v.string()),
+    stripePaymentIntentId: v.optional(v.string()),
+    expiresAt: v.optional(v.number()),
+    delegateCount: v.number(),
   }).index("organizerId", ["organizerId"]),
 
   committees: defineTable({

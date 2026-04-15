@@ -110,11 +110,12 @@ http.route({
   path: "/api/createEvent",
   method: "POST",
   handler: httpAction(async (ctx, request) => {
-    const { organizerId, name, startDate, endDate, description } = await request.json();
+    const { organizerId, name, startDate, endDate, description, plan } = await request.json();
     const args: any = { organizerId, name };
     if (startDate !== null && startDate !== undefined) args.startDate = startDate;
     if (endDate !== null && endDate !== undefined) args.endDate = endDate;
     if (description !== null && description !== undefined && description !== "") args.description = description;
+    if (plan !== null && plan !== undefined) args.plan = plan;
     const eventId = await ctx.runMutation(internal.api.createEvent, args);
     return new Response(JSON.stringify({ eventId }), {
       headers: { "Content-Type": "application/json" },
@@ -288,6 +289,48 @@ http.route({
   handler: httpAction(async (ctx, request) => {
     const committees = await ctx.runQuery(internal.api.getAllCommittees);
     return new Response(JSON.stringify(committees), {
+      headers: { "Content-Type": "application/json" },
+    });
+  }),
+});
+
+http.route({
+  path: "/api/getEventPaymentStatus",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    const { eventId } = await request.json();
+    const status = await ctx.runQuery(internal.api.getEventPaymentStatus, { eventId });
+    return new Response(JSON.stringify(status), {
+      headers: { "Content-Type": "application/json" },
+    });
+  }),
+});
+
+http.route({
+  path: "/api/updateEventPayment",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    const { eventId, stripeSessionId, stripePaymentIntentId, plan, expiresAt } = await request.json();
+    await ctx.runMutation(internal.api.updateEventPayment, {
+      eventId,
+      stripeSessionId,
+      stripePaymentIntentId,
+      plan,
+      expiresAt,
+    });
+    return new Response(JSON.stringify({ success: true }), {
+      headers: { "Content-Type": "application/json" },
+    });
+  }),
+});
+
+http.route({
+  path: "/api/updateEventDelegateCount",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    const { eventId, count } = await request.json();
+    await ctx.runMutation(internal.api.updateEventDelegateCount, { eventId, count });
+    return new Response(JSON.stringify({ success: true }), {
       headers: { "Content-Type": "application/json" },
     });
   }),
