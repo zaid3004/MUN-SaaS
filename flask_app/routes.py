@@ -255,19 +255,56 @@ def committees(event_id):
     if request.method == "POST":
         name = request.form.get("name")
         agenda = request.form.get("agenda")
-        chair = request.form.get("chair")
-        co_chair = request.form.get("co_chair")
+
+        chair_name = request.form.get("chair_name")
+        chair_email = request.form.get("chair_email")
+        chair_password = request.form.get("chair_password") or "changeme"
+
+        co_chair_name = request.form.get("co_chair_name")
+        co_chair_email = request.form.get("co_chair_email")
+        co_chair_password = request.form.get("co_chair_password") or "changeme"
 
         args = {"eventId": str(event_id), "name": name}
         if agenda:
             args["agenda"] = agenda
-        if chair:
-            args["chair"] = chair
-        if co_chair:
-            args["coChair"] = co_chair
+        if chair_name:
+            args["chair"] = chair_name
+        if co_chair_name:
+            args["coChair"] = co_chair_name
 
         try:
             convex_client.mutation("/api/createCommittee", args)
+
+            if chair_email:
+                existing = convex_client.query(
+                    "/api/getUserByEmail", {"email": chair_email}
+                )
+                if not existing:
+                    chair_user_id = convex_client.mutation(
+                        "/api/createDelegate",
+                        {
+                            "email": chair_email,
+                            "passwordHash": generate_password_hash(chair_password),
+                            "name": chair_name or "Chair",
+                            "country": "Chair",
+                        },
+                    )
+
+            if co_chair_email:
+                existing = convex_client.query(
+                    "/api/getUserByEmail", {"email": co_chair_email}
+                )
+                if not existing:
+                    co_chair_user_id = convex_client.mutation(
+                        "/api/createDelegate",
+                        {
+                            "email": co_chair_email,
+                            "passwordHash": generate_password_hash(co_chair_password),
+                            "name": co_chair_name or "Co-Chair",
+                            "country": "Co-Chair",
+                        },
+                    )
+
         except Exception as e:
             flash(f"Error creating committee: {e}", "error")
 
@@ -380,6 +417,36 @@ def manage_delegates(event_id):
 
     committee_id = request.args.get("committee_id")
 
+    if request.method == "POST":
+        name = request.form.get("name")
+        email = request.form.get("email")
+        country = request.form.get("country")
+        delegate_committee_id = request.form.get("committee_id") or None
+        password = request.form.get("password") or "changeme"
+
+        args = {
+            "email": email,
+            "passwordHash": generate_password_hash(password),
+            "name": name,
+            "country": country,
+        }
+        try:
+            user_id = convex_client.mutation("/api/createDelegate", args)
+            if delegate_committee_id and user_id:
+                convex_client.mutation(
+                    "/api/assignDelegateToCommittee",
+                    {
+                        "eventId": str(event_id),
+                        "userId": str(user_id),
+                        "committeeId": str(delegate_committee_id),
+                    },
+                )
+            flash("Delegate added successfully", "success")
+        except Exception as e:
+            flash(f"Error adding delegate: {e}", "error")
+
+        return redirect(url_for("bp.manage_delegates", event_id=event_id))
+
     committees = (
         convex_client.query("/api/getCommitteesByEvent", {"eventId": str(event_id)})
         or []
@@ -442,30 +509,56 @@ def export_delegate_passwords(event_id):
     rows = []
     for assignment in delegate_assignments:
         user_id = assignment.get("userId")
+        committee_id = assignment.get("committeeId")
+
         for user in all_delegates:
             if str(user.get("_id") or user.get("id")) == str(user_id):
-                committee_id = assignment.get("committeeId")
                 committee_name = ""
+                role = "delegate"
+
                 if committee_id:
                     for c in committees:
                         if str(c.get("_id") or c.get("id")) == str(committee_id):
                             committee_name = c.get("name")
+                            chair = c.get("chair", "")
+                            co_chair = c.get("coChair", "")
+
+                            if (
+                                chair
+                                and user.get("email")
+                                and chair.lower() in user.get("email", "").lower()
+                            ):
+                                role = "chair"
+                            elif (
+                                co_chair
+                                and user.get("email")
+                                and co_chair.lower() in user.get("email", "").lower()
+                            ):
+                                role = "co_chair"
                             break
+
                 rows.append(
                     {
                         "Name": user.get("name") or "",
                         "Email": user.get("email") or "",
                         "Country": user.get("country") or "",
                         "Committee": committee_name,
+                        "Role": role,
                         "Password": "",
                     }
                 )
                 break
 
-    rows.sort(key=lambda r: (r["Committee"] or "", r["Name"] or ""))
+    rows.sort(
+        key=lambda r: (
+            r["Committee"] or "",
+            {"chair": 0, "co_chair": 1, "delegate": 2}.get(r["Role"], 2),
+            r["Name"] or "",
+        )
+    )
 
     si = io.StringIO()
-    fieldnames = ["Name", "Email", "Country", "Committee", "Password"]
+    fieldnames = ["Name", "Email", "Country", "Committee", "Role", "Password"]
     writer = csv.DictWriter(si, fieldnames=fieldnames)
     writer.writeheader()
     for r in rows:
