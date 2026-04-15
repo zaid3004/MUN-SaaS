@@ -254,9 +254,9 @@ def committees(event_id):
 
     if request.method == "POST":
         name = request.form.get("name")
-        agenda = request.form.get("agenda")
-        chair = request.form.get("chair")
-        co_chair = request.form.get("co_chair")
+        agenda = request.form.get("agenda") or None
+        chair = request.form.get("chair") or None
+        co_chair = request.form.get("co_chair") or None
 
         try:
             convex_client.mutation(
