@@ -452,6 +452,8 @@ def manage_delegates(event_id):
         or []
     )
 
+    event = convex_client.query("/api/getEventById", {"id": str(event_id)})
+
     delegate_assignments = (
         convex_client.query("/api/getDelegatesByEvent", {"eventId": str(event_id)})
         or []
@@ -463,11 +465,13 @@ def manage_delegates(event_id):
         user_id = assignment.get("userId")
         for user in all_delegates:
             if str(user.get("_id") or user.get("id")) == str(user_id):
-                committee_id = assignment.get("committeeId")
+                assignment_committee_id = assignment.get("committeeId")
                 committee_name = ""
-                if committee_id:
+                if assignment_committee_id:
                     for c in committees:
-                        if str(c.get("_id") or c.get("id")) == str(committee_id):
+                        if str(c.get("_id") or c.get("id")) == str(
+                            assignment_committee_id
+                        ):
                             committee_name = c.get("name")
                             break
                 delegates.append(
@@ -477,17 +481,32 @@ def manage_delegates(event_id):
                         "country": user.get("country"),
                         "id": user.get("_id") or user.get("id"),
                         "committee": committee_name,
-                        "committee_id": committee_id,
+                        "committee_id": assignment_committee_id,
                     }
                 )
                 break
 
+    grouped = []
+    for c in committees:
+        committee_delegates = [
+            d
+            for d in delegates
+            if d.get("committee_id") == c.get("_id")
+            or d.get("committee_id") == c.get("id")
+        ]
+        grouped.append({"committee": c, "delegates": committee_delegates})
+
+    unassigned = [d for d in delegates if not d.get("committee_id")]
+
     return render_template(
         "delegates_manage.html",
         event_id=event_id,
+        event=event,
         committees=committees,
         committee_id=committee_id,
         delegates=delegates,
+        grouped=grouped,
+        unassigned=unassigned,
     )
 
 
