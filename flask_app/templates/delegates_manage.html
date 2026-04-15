@@ -81,74 +81,75 @@
 <section class="mb-8">
   <div class="container" id="committees-list">
     {% for group in grouped %}
-    {% set comm_id = 'comm-' ~ group.committee.name|lower|replace(' ', '-') %}
-    <div id="{{ comm_id }}" class="committee-card card mun-spotlight-card mb-6" style="padding: 0; overflow: hidden; border: 1px solid var(--border);">
-      {% set comm_id = 'comm-' ~ group.committee.name|lower|replace(' ', '-') %}
-    <button type="button" class="committee-toggle" data-target="{{ comm_id }}" style="width: 100%; padding: var(--space-4) var(--space-5); background: transparent; border: none; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
-        <h2 class="h2" style="font-size: 1.15rem; margin: 0; color: var(--foreground);">{{ group.committee.name }} <span class="text-secondary" style="font-size: 0.8rem; font-weight: 500;">{{ group.delegates|length }} members</span></h2>
-        <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.3s ease;">
-          <polyline points="6 9 12 15 18 9"/>
-        </svg>
-      </button>
-      
-      {% set comm_id = 'comm-' ~ group.committee.name|lower|replace(' ', '-') %}
-    <div id="{{ comm_id }}-content" class="committee-content" style="display: none; padding: var(--space-4) var(--space-5); border-top: 1px solid var(--border);">
-        {% if group.committee.chair or group.committee.coChair %}
-        <div style="margin-bottom: var(--space-4); padding-bottom: var(--space-4); border-bottom: 1px solid var(--border);">
-          <p style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--primary); margin-bottom: var(--space-3);">Leadership</p>
-          {% if group.committee.chair %}
-          <div style="display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-2);">
-            <span class="badge badge-primary" style="font-size: 0.65rem;">Chair</span>
-            <span style="color: var(--foreground); font-weight: 500;">{{ group.committee.chair }}</span>
-          {% endif %}
-          {% if group.committee.coChair %}
-          <div style="display: flex; align-items: center; gap: var(--space-3);">
-            <span class="badge badge-primary" style="font-size: 0.65rem;">Co-Chair</span>
-            <span style="color: var(--foreground); font-weight: 500;">{{ group.committee.coChair }}</span>
-          {% endif %}
-        </div>
-        {% endif %}
-        
-        {% if group.delegates %}
-        <p style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--primary); margin-bottom: var(--space-3);">Delegates</p>
-        <ul class="mun-list" style="margin-bottom: var(--space-4);">
-          {% for d in group.delegates %}
-          <li class="mun-list-item" style="padding: var(--space-3) var(--space-4); margin-bottom: var(--space-2);">
-            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-2);">
-              <div>
-                <span style="color: var(--foreground); font-weight: 500;">{{ d.name }}</span>
-                <span class="text-secondary" style="font-size: 0.85rem;"> · {{ d.email }}</span>
-                <span class="text-secondary" style="font-size: 0.8rem; margin-left: var(--space-2);">· {{ d.country or '—' }}</span>
-              </div>
-              <a href="/events/{{ event_id }}/delegates/{{ d.id }}/edit" class="btn btn-sm btn-outline-primary ripple">Edit</a>
+    <div class="committee-group" style="margin-bottom: var(--space-6);">
+      <div class="committee-card card mun-spotlight-card" style="padding: 0; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-xl);">
+        <button type="button" class="committee-toggle" style="width: 100%; padding: var(--space-4) var(--space-5); background: transparent; border: none; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-radius: var(--radius-xl) var(--radius-xl) 0 0;">
+          <h2 class="h2" style="font-size: 1.15rem; margin: 0; color: var(--foreground);">{{ group.committee.name }} <span class="text-secondary" style="font-size: 0.8rem; font-weight: 500;">{{ group.delegates|length }} members</span></h2>
+          <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.3s ease;">
+            <polyline points="6 9 12 15 18 9"/>
+          </svg>
+        </button>
+
+        <div class="committee-content" style="display: none; padding: var(--space-4) var(--space-5); border-top: 1px solid var(--border);">
+          {% if group.committee.chair or group.committee.coChair %}
+          <div style="margin-bottom: var(--space-4); padding-bottom: var(--space-4); border-bottom: 1px solid var(--border);">
+            <p style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--primary); margin-bottom: var(--space-3);">Leadership</p>
+            {% if group.committee.chair %}
+            <div style="display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-2);">
+              <span class="badge badge-primary" style="font-size: 0.65rem;">Chair</span>
+              <span style="color: var(--foreground); font-weight: 500;">{{ group.committee.chair }}</span>
             </div>
-          </li>
-          {% endfor %}
-        </ul>
-        {% else %}
-        <p class="text-secondary" style="margin-bottom: var(--space-4);">No delegates in this committee yet.</p>
-        {% endif %}
-        
-        <form method="post" action="/events/{{ event_id }}/delegates" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); border-top: 1px solid var(--border); padding-top: var(--space-4);">
-          <input type="hidden" name="committee_id" value="{{ group.committee.id }}">
-          <div class="form-group" style="margin-bottom: 0;">
-            <label class="form-label" for="name_{{ group.committee.id }}">Name</label>
-            <input class="form-control" id="name_{{ group.committee.id }}" name="name" placeholder="Delegate name" required>
+            {% endif %}
+            {% if group.committee.coChair %}
+            <div style="display: flex; align-items: center; gap: var(--space-3);">
+              <span class="badge badge-primary" style="font-size: 0.65rem;">Co-Chair</span>
+              <span style="color: var(--foreground); font-weight: 500;">{{ group.committee.coChair }}</span>
+            </div>
+            {% endif %}
           </div>
-          <div class="form-group" style="margin-bottom: 0;">
-            <label class="form-label" for="email_{{ group.committee.id }}">Email</label>
-            <input class="form-control" id="email_{{ group.committee.id }}" name="email" type="email" placeholder="delegate@school.edu" required>
-          </div>
-          <div class="form-group" style="margin-bottom: 0;">
-            <label class="form-label" for="country_{{ group.committee.id }}">Country</label>
-            <input class="form-control" id="country_{{ group.committee.id }}" name="country" placeholder="Country">
-          </div>
-          <div class="form-group" style="margin-bottom: 0;">
-            <label class="form-label" for="password_{{ group.committee.id }}">Password</label>
-            <input class="form-control" id="password_{{ group.committee.id }}" name="password" type="password" placeholder="Password" required>
-          </div>
-          <button class="btn btn-primary ripple" type="submit" style="grid-column: span 2;">Add delegate</button>
-        </form>
+          {% endif %}
+
+          {% if group.delegates %}
+          <p style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--primary); margin-bottom: var(--space-3);">Delegates</p>
+          <ul class="mun-list" style="margin-bottom: var(--space-4);">
+            {% for d in group.delegates %}
+            <li class="mun-list-item" style="padding: var(--space-3) var(--space-4); margin-bottom: var(--space-2);">
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-2);">
+                <div>
+                  <span style="color: var(--foreground); font-weight: 500;">{{ d.name }}</span>
+                  <span class="text-secondary" style="font-size: 0.85rem;"> · {{ d.email }}</span>
+                  <span class="text-secondary" style="font-size: 0.8rem; margin-left: var(--space-2);">· {{ d.country or '—' }}</span>
+                </div>
+                <a href="/events/{{ event_id }}/delegates/{{ d.id }}/edit" class="btn btn-sm btn-outline-primary ripple">Edit</a>
+              </div>
+            </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <p class="text-secondary" style="margin-bottom: var(--space-4);">No delegates in this committee yet.</p>
+          {% endif %}
+
+          <form method="post" action="/events/{{ event_id }}/delegates" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); border-top: 1px solid var(--border); padding-top: var(--space-4);">
+            <input type="hidden" name="committee_id" value="{{ group.committee.id }}">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="name_{{ group.committee.id }}">Name</label>
+              <input class="form-control" id="name_{{ group.committee.id }}" name="name" placeholder="Delegate name" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="email_{{ group.committee.id }}">Email</label>
+              <input class="form-control" id="email_{{ group.committee.id }}" name="email" type="email" placeholder="delegate@school.edu" required>
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="country_{{ group.committee.id }}">Country</label>
+              <input class="form-control" id="country_{{ group.committee.id }}" name="country" placeholder="Country">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="password_{{ group.committee.id }}">Password</label>
+              <input class="form-control" id="password_{{ group.committee.id }}" name="password" type="password" placeholder="Password" required>
+            </div>
+            <button class="btn btn-primary ripple" type="submit" style="grid-column: span 2;">Add delegate</button>
+          </form>
+        </div>
       </div>
     </div>
     <hr style="border: none; border-top: 1px solid var(--border); margin: var(--space-2) 0;">
@@ -180,8 +181,8 @@
 document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.committee-toggle').forEach(function(btn) {
     btn.addEventListener('click', function() {
-      var targetId = this.getAttribute('data-target') + '-content';
-      var content = document.getElementById(targetId);
+      var card = this.closest('.committee-card');
+      var content = card.querySelector('.committee-content');
       var chevron = this.querySelector('.chevron');
       
       if (content.style.display === 'none') {
