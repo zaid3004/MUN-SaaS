@@ -200,8 +200,8 @@ def events():
     organizer_id = session.get("organizer_id")
     if request.method == "POST":
         name = request.form.get("name")
-        start_date_str = request.form.get("start_date")
-        end_date_str = request.form.get("end_date")
+        start_date_str = request.form.get("start_date") or None
+        end_date_str = request.form.get("end_date") or None
         start = (
             int(datetime.strptime(start_date_str, "%Y-%m-%d").timestamp() * 1000)
             if start_date_str
@@ -212,7 +212,7 @@ def events():
             if end_date_str
             else None
         )
-        description = request.form.get("description")
+        description = request.form.get("description") or None
 
         if not name:
             if request.headers.get("X-Requested-With") == "XMLHttpRequest":
