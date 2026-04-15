@@ -11,7 +11,6 @@ from flask import (
     jsonify,
 )
 from .convex_client import convex_client
-from . import posthog_client
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
@@ -80,11 +79,8 @@ def register():
                 session["role"] = user.get("role")
                 session["organizer_id"] = str(organizer_id)
                 session["user_name"] = user.get("name")
-                posthog_client.set(str(user_id), {"role": user.get("role", "organizer")})
-                posthog_client.capture(str(user_id), "organizer_registered", {"signup_method": "form"})
                 return redirect(url_for("bp.dashboard"))
         except Exception as e:
-            posthog_client.capture_exception(e)
             return render_template("register.html", error=str(e))
     return render_template("register.html")
 
@@ -102,10 +98,7 @@ def login():
             session["role"] = user.get("role")
             session["organizer_id"] = user.get("organizerId")
             session["user_name"] = user.get("name")
-            posthog_client.set(str(user_id), {"role": user.get("role")})
-            posthog_client.capture(str(user_id), "user_logged_in", {"login_method": "password"})
             return redirect(url_for("bp.dashboard"))
-        posthog_client.capture("anonymous", "login_failed")
         return render_template("login.html", error="Invalid credentials")
     return render_template("login.html")
 
@@ -132,7 +125,6 @@ def forgot_password():
             except:
                 pass
             print(f"PASSWORD RESET TOKEN for {email}: {token}")
-            posthog_client.capture(str(user.get("_id") or user.get("id")), "password_reset_requested")
             flash("Password reset instructions sent to your email", "success")
         else:
             flash(
@@ -238,18 +230,12 @@ def events():
                     "description": description,
                 },
             )
-            posthog_client.capture(
-                str(session.get("user_id")),
-                "event_created",
-                {"has_start_date": start is not None, "has_end_date": end is not None, "has_description": bool(description)},
-            )
             if request.headers.get("X-Requested-With") == "XMLHttpRequest":
                 return jsonify(
                     {"success": True, "message": "Event created successfully"}
                 )
             return redirect(url_for("bp.dashboard"))
         except Exception as e:
-            posthog_client.capture_exception(e)
             if request.headers.get("X-Requested-With") == "XMLHttpRequest":
                 return jsonify({"success": False, "message": str(e)})
             return render_template("events.html", error=str(e))
@@ -283,13 +269,7 @@ def committees(event_id):
                     "coChair": co_chair,
                 },
             )
-            posthog_client.capture(
-                str(session.get("user_id")),
-                "committee_created",
-                {"has_agenda": bool(agenda), "has_chair": bool(chair), "has_co_chair": bool(co_chair)},
-            )
         except Exception as e:
-            posthog_client.capture_exception(e)
             flash(f"Error creating committee: {e}", "error")
 
         return redirect(url_for("bp.committees", event_id=event_id))
@@ -341,13 +321,7 @@ def delegates(event_id):
                         "committeeId": str(committee_id),
                     },
                 )
-            posthog_client.capture(
-                str(session.get("user_id")),
-                "delegate_added",
-                {"has_committee": bool(committee_id), "has_country": bool(country)},
-            )
         except Exception as e:
-            posthog_client.capture_exception(e)
             flash(f"Error creating delegate: {e}", "error")
 
         return redirect(url_for("bp.delegates", event_id=event_id))
@@ -436,11 +410,6 @@ def export_delegate_passwords(event_id):
                 break
 
     rows.sort(key=lambda r: (r["Committee"] or "", r["Name"] or ""))
-    posthog_client.capture(
-        str(session.get("user_id")),
-        "delegate_passwords_exported",
-        {"delegate_count": len(rows)},
-    )
 
     si = io.StringIO()
     fieldnames = ["Name", "Email", "Country", "Committee", "Password"]
@@ -474,13 +443,7 @@ def chat(event_id):
                         "message": text,
                     },
                 )
-                posthog_client.capture(
-                    str(session.get("user_id")),
-                    "chat_message_sent",
-                    {"message_length": len(text)},
-                )
             except Exception as e:
-                posthog_client.capture_exception(e)
                 flash(f"Error sending message: {e}", "error")
 
     messages = (
@@ -516,14 +479,8 @@ def announcements(event_id):
                         "isPinned": is_pinned,
                     },
                 )
-                posthog_client.capture(
-                    str(session.get("user_id")),
-                    "announcement_created",
-                    {"is_pinned": is_pinned, "poster_role": session.get("role")},
-                )
                 flash("Announcement created successfully", "success")
             except Exception as e:
-                posthog_client.capture_exception(e)
                 flash(f"Error creating announcement: {e}", "error")
 
         return redirect(url_for("bp.announcements", event_id=event_id))
@@ -591,20 +548,16 @@ def manage_events(event_id):
                         "endDate": end_date,
                     },
                 )
-                posthog_client.capture(str(session.get("user_id")), "event_updated")
                 flash("Event updated successfully", "success")
             except Exception as e:
-                posthog_client.capture_exception(e)
                 flash(f"Error updating event: {e}", "error")
 
         elif action == "delete":
             try:
                 convex_client.mutation("/api/deleteEvent", {"id": event_id})
-                posthog_client.capture(str(session.get("user_id")), "event_deleted")
                 flash("Event deleted successfully", "success")
                 return redirect(url_for("bp.events"))
             except Exception as e:
-                posthog_client.capture_exception(e)
                 flash(f"Error deleting event: {e}", "error")
 
         return redirect(url_for("bp.events"))
