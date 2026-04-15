@@ -486,8 +486,10 @@ def manage_delegates(event_id):
                 )
                 break
 
+    sorted_committees = sorted(committees, key=lambda x: x.get("name", "").lower())
+
     grouped = []
-    for c in committees:
+    for c in sorted_committees:
         committee_delegates = [
             d
             for d in delegates

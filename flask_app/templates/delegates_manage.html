@@ -82,14 +82,14 @@
   <div class="container" id="committees-list">
     {% for group in grouped %}
     <div class="committee-card card mun-spotlight-card mb-4" style="padding: 0; overflow: hidden;">
-      <button type="button" class="committee-toggle" data-committee="{{ group.committee.id }}" style="width: 100%; padding: var(--space-4) var(--space-5); background: transparent; border: none; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
+      <button type="button" class="committee-toggle" data-committee="{{ loop.index0 }}" style="width: 100%; padding: var(--space-4) var(--space-5); background: transparent; border: none; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center;">
         <h2 class="h2" style="font-size: 1.15rem; margin: 0; color: var(--foreground);">{{ group.committee.name }} <span class="text-secondary" style="font-size: 0.8rem; font-weight: 500;">{{ group.delegates|length }} members</span></h2>
         <svg class="chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="transition: transform 0.3s ease;">
           <polyline points="6 9 12 15 18 9"/>
         </svg>
       </button>
       
-      <div class="committee-content" data-committee="{{ group.committee.id }}" style="display: none; padding: var(--space-4) var(--space-5); border-top: 1px solid var(--border);">
+      <div class="committee-content" data-committee="{{ loop.index0 }}" style="display: none; padding: var(--space-4) var(--space-5); border-top: 1px solid var(--border);">
         {% if group.committee.chair or group.committee.coChair %}
         <div style="margin-bottom: var(--space-4); padding-bottom: var(--space-4); border-bottom: 1px solid var(--border);">
           <p style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--primary); margin-bottom: var(--space-3);">Leadership</p>
@@ -176,23 +176,19 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  document.querySelectorAll('.committee-toggle').forEach(function(btn) {
+  var toggles = document.querySelectorAll('.committee-toggle');
+  var contents = document.querySelectorAll('.committee-content');
+  
+  toggles.forEach(function(btn, idx) {
     btn.addEventListener('click', function() {
-      var committeeId = this.dataset.committee;
-      var content = document.querySelector('.committee-content[data-committee="' + committeeId + '"]');
-      var chevron = this.querySelector('.chevron');
-      
-      document.querySelectorAll('.committee-content').forEach(function(c) {
-        c.style.display = 'none';
-      });
-      document.querySelectorAll('.chevron').forEach(function(ch) {
-        ch.style.transform = 'rotate(0deg)';
-      });
-      
-      content.style.display = 'block';
-      chevron.style.transform = 'rotate(180deg)';
+      contents.forEach(function(c) { c.style.display = 'none'; });
+      document.querySelectorAll('.chevron').forEach(function(ch) { ch.style.transform = 'rotate(0deg)'; });
+      contents[idx].style.display = 'block';
+      toggles[idx].querySelector('.chevron').style.transform = 'rotate(180deg)';
     });
   });
+  
+  if (toggles.length > 0) toggles[0].click();
 });
 </script>
 {% endblock %}
