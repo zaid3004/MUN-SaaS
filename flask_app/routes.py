@@ -278,7 +278,10 @@ def committees(event_id):
         convex_client.query("/api/getCommitteesByEvent", {"eventId": str(event_id)})
         or []
     )
-    return render_template("committees.html", committees=committees, event_id=event_id)
+    event = convex_client.query("/api/getEventById", {"id": str(event_id)})
+    return render_template(
+        "committees.html", committees=committees, event_id=event_id, event=event
+    )
 
 
 @bp.route("/events/<event_id>/delegates", methods=["GET", "POST"])
