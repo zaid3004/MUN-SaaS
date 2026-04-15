@@ -97,13 +97,19 @@
             {% if group.committee.chair %}
             <div style="display: flex; align-items: center; gap: var(--space-3); margin-bottom: var(--space-2);">
               <span class="badge badge-primary" style="font-size: 0.65rem;">Chair</span>
-              <span style="color: var(--foreground); font-weight: 500;">{{ group.committee.chair }}</span>
+              <div style="color: var(--foreground);">
+                <span style="font-weight: 500;">{{ group.committee.chair }}</span>
+                {% if group.committee.chair_email %}<span class="text-secondary" style="font-size: 0.8rem; margin-left: var(--space-2);">{{ group.committee.chair_email }}</span>{% endif %}
+              </div>
             </div>
             {% endif %}
             {% if group.committee.coChair %}
             <div style="display: flex; align-items: center; gap: var(--space-3);">
               <span class="badge badge-primary" style="font-size: 0.65rem;">Co-Chair</span>
-              <span style="color: var(--foreground); font-weight: 500;">{{ group.committee.coChair }}</span>
+              <div style="color: var(--foreground);">
+                <span style="font-weight: 500;">{{ group.committee.coChair }}</span>
+                {% if group.committee.coChair_email %}<span class="text-secondary" style="font-size: 0.8rem; margin-left: var(--space-2);">{{ group.committee.coChair_email }}</span>{% endif %}
+              </div>
             </div>
             {% endif %}
           </div>
@@ -152,7 +158,7 @@
         </div>
       </div>
     </div>
-    <hr style="border: none; border-top: 1px solid var(--border); margin: var(--space-2) 0;">
+    <!-- <hr style="border: none; border-top: 1px solid var(--border); margin: var(--space-2) 0;"> -->
     {% endfor %}
 
     <h2 class="h2" style="font-size: 1.15rem; margin: var(--space-8) 0 var(--space-4);">Unassigned delegates</h2>

@@ -488,6 +488,17 @@ def manage_delegates(event_id):
 
     sorted_committees = sorted(committees, key=lambda x: x.get("name", "").lower())
 
+    all_users = convex_client.query("/api/getAllDelegates") or []
+
+    def find_user_email_by_name(name):
+        if not name:
+            return None
+        name_lower = name.lower()
+        for u in all_users:
+            if name_lower in u.get("name", "").lower():
+                return u.get("email")
+        return None
+
     grouped = []
     for c in sorted_committees:
         committee_delegates = [
@@ -496,6 +507,12 @@ def manage_delegates(event_id):
             if d.get("committee_id") == c.get("_id")
             or d.get("committee_id") == c.get("id")
         ]
+        chair_name = c.get("chair")
+        co_chair_name = c.get("coChair")
+        c["chair_email"] = find_user_email_by_name(chair_name) if chair_name else None
+        c["coChair_email"] = (
+            find_user_email_by_name(co_chair_name) if co_chair_name else None
+        )
         grouped.append({"committee": c, "delegates": committee_delegates})
 
     unassigned = [d for d in delegates if not d.get("committee_id")]
