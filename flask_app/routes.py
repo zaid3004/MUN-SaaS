@@ -11,7 +11,6 @@ from flask import (
     jsonify,
 )
 from .convex_client import convex_client
-from .email_utils import send_password_reset_email
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 import os
@@ -125,12 +124,7 @@ def forgot_password():
                 )
             except:
                 pass
-
-            site_url = os.getenv("CONVEX_SITE_URL", "https://mun-saas.com")
-            reset_link = f"{site_url}/reset-password/{token}"
-
-            send_password_reset_email(email, reset_link)
-
+            print(f"PASSWORD RESET TOKEN for {email}: {token}")
             flash("Password reset instructions sent to your email", "success")
         else:
             flash(

@@ -440,12 +440,6 @@ code, .text-mono {
   color: var(--destructive-foreground);
   box-shadow: 0 4px 28px color-mix(in srgb, var(--destructive) 38%, transparent);
 }
-.btn-danger:hover {
-  background: color-mix(in srgb, var(--destructive) 90%, white);
-  transform: translateY(-2px) scale(1.02);
-  box-shadow: 0 8px 32px color-mix(in srgb, var(--destructive) 48%, transparent);
-  color: var(--destructive-foreground);
-}
 
 .btn-ghost {
   background: transparent;
@@ -1685,10 +1679,9 @@ textarea.form-control { min-height: 6rem; resize: vertical; }
 
 .auth-cube-submit:hover,
 .auth-cube-submit:focus-visible { 
-  color: var(--white);
+  color: var(--primary-foreground);
   transform: translateY(-2px);
   box-shadow: 0 8px 24px color-mix(in srgb, var(--primary) 40%, transparent);
-  border-radius: 4px;
 }
 
 .auth-cube-submit:hover .auth-cube-back .auth-cube-inner,
