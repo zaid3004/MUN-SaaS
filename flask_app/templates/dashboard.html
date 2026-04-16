@@ -6,7 +6,7 @@
 <!-- Hero Section with Text Carousel -->
 <section class="hero hero-water" style="position: relative; padding: var(--space-16) 0; margin-bottom: var(--space-12); overflow: hidden; border-radius: var(--radius-2xl); background: var(--primary);">
   <div class="water-mesh" aria-hidden="true"></div>
-  <div style="position: absolute; inset: 0; background: linear-gradient(135deg, var(--primary) 35%, #bcb9b9 80%); z-index: 0;"></div>
+  <div style="position: absolute; inset: 0; background: linear-gradient(310deg, var(--color-background) 15%, color-mix(in srgb, #3F5273 100%, transparent) 60%);"></div>
   <div class="container" style="position: relative; z-index: 1;">
     <div class="row" style="display: grid; grid-template-columns: 1fr; gap: var(--space-8); align-items: center;">
       <div class="hero-content">
@@ -41,12 +41,12 @@
   <div class="container">
     <div class="bento-grid asymmetric">
       <!-- Events Card -->
-      <div class="card mun-spotlight-card animate-on-scroll water-edge" data-animate="fadeInUp" data-delay="0" data-duration="0.75" style="grid-column: span 1; grid-row: span 1; transition: all var(--duration-normal) var(--ease-out);">
-        <div class="card-body" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+      <div class="card mun-spotlight-card animate-on-scroll water-edge" data-animate="fadeInUp" data-delay="0" data-duration="0.75" style="grid-column: span 1; grid-row: span 1; transition: all var(--duration-normal) var(--ease-out); background: linear-gradient(135deg, var(--color-surface) 0%, color-mix(in srgb, var(--primary) 6%, transparent) 100%)">
+        <div class="card-body" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%; ">
           <div>
             <div class="card-title" style="text-decoration: none;">Active Events</div>
             <br>
-            <div class="h2 mb-0 stat-counter" data-count-to="{{ events|length or 0 }}" data-duration="1200" style="font-size: 3rem; font-weight: 800; color: var(--primary); line-height: 1;">0</div>
+            <div class="h2 mb-0 stat-counter" data-count-to="{{ events|length or 0 }}" data-duration="1200" style="font-size: 3rem; font-weight: 800; color: var(--color-primary); line-height: 1;">0</div>
           </div>
           {% if events and events|length > 0 %}
           <div class="mt-4">
@@ -76,7 +76,7 @@
           <div>
             <div class="card-title" style="text-decoration: none;">Total Delegates</div>
             <br>
-            <div class="h2 mb-0 stat-counter" data-count-to="{{ (delegates|length) or 0 }}" data-duration="1400" style="font-size: 2.5rem; font-weight: 700; color: var(--color-primary); line-height: 1;">0</div>
+            <div class="h2 mb-0 stat-counter" data-count-to="{{ (delegates|length) or 0 }}" data-duration="1400" style="font-size: 3rem; font-weight: 700; color: var(--color-primary); line-height: 1;">0</div>
           </div>
           <!-- <div class="mt-4" style="display: flex; align-items: center; gap: var(--space-2);">
             <div style="width: 8px; height: 8px; border-radius: 50%; background: var(--color-success); box-shadow: 0 0 0 4px color-mix(in srgb, var(--chart-4) 18%, transparent);"></div>
@@ -86,12 +86,12 @@
       </div>
 
       <!-- Committees Card -->
-      <div class="card mun-spotlight-card animate-on-scroll water-edge" data-animate="fadeInUp" data-delay="160" data-duration="0.75" style="grid-column: span 1; grid-row: span 1;">
+      <div class="card mun-spotlight-card animate-on-scroll water-edge" data-animate="fadeInUp" data-delay="160" data-duration="0.75" style="grid-column: span 1; grid-row: span 1; background: linear-gradient(135deg, var(--color-surface) 0%, color-mix(in srgb, var(--primary) 6%, transparent) 100%)">
         <div class="card-body" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
           <div>
             <div class="card-title" style="text-decoration: none;">Committees</div>
             <br>
-            <div class="h2 mb-0 stat-counter" data-count-to="{{ (committees|length) or 0 }}" data-duration="1600" style="font-size: 3rem; font-weight: 800; color: var(--primary); line-height: 1;">0</div>
+            <div class="h2 mb-0 stat-counter" data-count-to="{{ (committees|length) or 0 }}" data-duration="1600" style="font-size: 3rem; font-weight: 800; color: var(--color-primary); line-height: 1;">0</div>
           </div>
           <!-- <div class="mt-4">
             <div class="badge badge-success">All operational</div>

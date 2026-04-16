@@ -38,30 +38,30 @@
           <h2 class="mun-modal-split__title" id="createEventModalLabel" style="color: white;">Create an event</h2>
           <p class="mun-modal-split__lede" style="color: white;">Name your session, set the calendar, and give delegates a short brief — everything else builds from here.</p>
 
-          <form id="createEventForm" method="post" action="/events" class="mun-modal-split__form">
+            <form id="createEventForm" method="post" action="/events" class="mun-modal-split__form">
             <div class="form-group">
               <label class="form-label" for="name" style="color: white;">Event name</label>
               <input type="text" class="form-control" id="name" name="name"
-                placeholder="e.g., Harvard Model UN 2025" required autocomplete="off" style="outline: rgba(99, 102, 241, 0.5) solid 2px;">
+              placeholder="e.g., Harvard Model UN 2026" required autocomplete="on" style="outline: rgba(77, 78, 178, 0.5) solid 2px;" />
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
               <div class="form-group">
-                <label class="form-label" for="start_date" style="color: white;">Start date</label>
-                <input type="date" class="form-control" id="start_date" name="start_date" required style="color-scheme: dark;">
+              <label class="form-label" for="start_date" style="color: white;">Start date</label>
+              <input type="date" class="form-control" id="start_date" name="start_date" required style="color-scheme: dark; outline: rgba(77, 78, 178, 0.5) solid 2px;" />
               </div>
               <div class="form-group">
-                <label class="form-label" for="end_date" style="color: white;">End date</label>
-                <input type="date" class="form-control" id="end_date" name="end_date" style="color-scheme: dark;">
+              <label class="form-label" for="end_date" style="color: white;">End date</label>
+              <input type="date" class="form-control" id="end_date" name="end_date" required style="color-scheme: dark; outline: rgba(77, 78, 178, 0.5) solid 2px;" />
               </div>
             </div>
 
             <div class="form-group">
               <label class="form-label" for="description" style="color: white;">Description</label>
-              <textarea class="form-control" id="description" name="description" rows="3"
-                placeholder="Brief description of the event"></textarea>
+              <textarea class="form-control" id="description" name="description" rows="3" autocomplete="off"
+              placeholder="Brief description of the event" style="outline: rgba(77, 78, 178, 0.5) solid 2px;"></textarea>
             </div>
-          </form>
+            </form>
 
           <div class="mun-modal-split__actions">
             <button type="button" class="btn btn-sage-outline" data-bs-dismiss="modal">Cancel</button>
