@@ -36,8 +36,8 @@
     <div class="card mun-spotlight-card" style="padding: var(--space-6);">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-6); flex-wrap: wrap; gap: var(--space-4);">
         <div>
-          <h2 class="h2" style="font-size: 1.25rem; margin: 0; color: var(--foreground);">Current Plan</h2>
-          <p class="text-secondary" style="margin-top: var(--space-2);">{{ pricing[plan].name }} - {{ delegate_count }} / {{ max_delegates }} delegates</p>
+          <h2 class="h2" style="font-size: 1.25rem; margin: 0; color: white; text-decoration: underline;">Current Plan</h2>
+          <p class="text-secondary" style="margin-top: var(--space-2); color: white;">{{ pricing[plan].name }} - {{ delegate_count }} / {{ max_delegates }} delegates</p>
         </div>
         <div>
           {% if is_paid %}
@@ -50,22 +50,22 @@
       
       {% if not is_paid %}
       <div style="background: color-mix(in srgb, var(--primary) 10%, transparent); padding: var(--space-4); border-radius: var(--radius-lg); margin-bottom: var(--space-6);">
-        <p class="text-secondary">Complete payment to unlock all features. Your event is currently restricted.</p>
+        <p class="text-secondary" style="color: white;">Complete payment to unlock all features. Your event is currently restricted.</p>
       </div>
       {% endif %}
       
-      <h3 class="h3" style="font-size: 1rem; margin-bottom: var(--space-4); color: var(--foreground);">Choose a Plan</h3>
+      <h3 class="h3" style="font-size: 1rem; margin-bottom: var(--space-4); color: var(--background);">Choose a Plan</h3>
       
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6);">
         {% for plan_key, plan_info in pricing.items() %}
-        <div class="card {% if plan == plan_key %}mun-spotlight-card{% else %}mun-card{% endif %}" style="padding: var(--space-5); border: 2px solid {% if plan == plan_key %}var(--primary){% else %}var(--border){% endif %}; border-radius: var(--radius-xl);">
-          {% if plan_key == 'medium' %}
-          <span class="badge badge-primary" style="position: absolute; top: calc(var(--space-3) * -1); right: var(--space-3);">Popular</span>
-          {% endif %}
+        <div class="card {% if plan == plan_key %}mun-spotlight-card{% else %}mun-card{% endif %}" style="position: relative; padding: var(--space-5); border: 2px solid {% if plan == plan_key %} var(--primary) {% else %} var(--border){% endif %}; border-radius: var(--radius-xl);">
           
-          <h4 style="font-size: 1.1rem; font-weight: 600; color: var(--foreground); margin-bottom: var(--space-2);">{{ plan_info.name }}</h4>
+          {% if plan_key == 'medium' %}
+          <span class="badge badge-primary" style="position: relative; top: calc(var(--space-3) * -1); right: var(--space-3);">Popular</span>
+          {% endif %}
+          <h4 style="font-size: 1.1rem; font-weight: 600; color: white; margin-bottom: var(--space-2);">{{ plan_info.name }}</h4>
           <div style="font-size: 1.75rem; font-weight: 700; color: var(--primary); margin-bottom: var(--space-3);">AED {{ plan_info.price }}</div>
-          <p class="text-secondary" style="font-size: 0.9rem; margin-bottom: var(--space-4);">Up to {{ plan_info.max_delegates }} delegates</p>
+          <p class="text-secondary" style="font-size: 0.9rem; margin-bottom: var(--space-4); color: white;">Up to {{ plan_info.max_delegates }} delegates</p>
           
           <form method="post" action="{{ url_for('bp.billing', event_id=event_id) }}">
             <input type="hidden" name="plan" value="{{ plan_key }}">
@@ -85,47 +85,71 @@
         {% endfor %}
       </div>
       
-      <div style="border-top: 1px solid var(--border); padding-top: var(--space-6);">
-        <h4 style="font-size: 1rem; font-weight: 600; color: var(--foreground); margin-bottom: var(--space-4);">Plan Features</h4>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-3);">
-          <div style="display: flex; align-items: center; gap: var(--space-2);">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-            <span class="text-secondary" style="font-size: 0.9rem;">Delegate management</span>
+        <div style="border-top: 1px solid var(--border); padding-top: var(--space-6);">
+          <h4 style="font-size: 1rem; font-weight: 600; color: var(--background); margin-bottom: var(--space-4);">Plan Features</h4>
+          <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; font-size: 0.875rem;">
+              <thead>
+                <tr>
+                  <th style="text-align: left; padding: var(--space-3) var(--space-4); color: var(--background); font-weight: 600; border-bottom: 2px solid var(--border); width: 40%;">Feature</th>
+                  <th style="text-align: center; padding: var(--space-3) var(--space-4); color: var(--background); font-weight: 600; border-bottom: 2px solid var(--border);">
+                    Small<br>
+                    <span style="font-weight: 400; color: var(--background); font-size: 0.78rem;">0–100 delegates</span>
+                  </th>
+                  <th style="text-align: center; padding: var(--space-3) var(--space-4); color: var(--background); font-weight: 600; border-bottom: 2px solid var(--border);">
+                    Medium ⭐<br>
+                    <span style="font-weight: 400; color: var(--background); font-size: 0.78rem;">101–200 delegates</span>
+                  </th>
+                  <th style="text-align: center; padding: var(--space-3) var(--space-4); color: var(--background); font-weight: 600; border-bottom: 2px solid var(--border);">
+                    Large<br>
+                    <span style="font-weight: 400; color: var(--background); font-size: 0.78rem;">201+ delegates</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody style="color: white;">
+                {% set features = [
+                  ('Delegate management',          true,  true,  true),
+                  ('Unlimited committees',         true,  true,  true),
+                  ('Document sharing',             true,  true,  true),
+                  ('Announcements',                true,  true,  true),
+                  ('Committee chat rooms',         false, true,  true),
+                  ('Improved document organization', false, true, true),
+                  ('Delegate activity tracking',   false, true,  true),
+                  ('Role-based dashboards',        false, true,  true),
+                  ('Advanced analytics dashboard', false, false, true),
+                  ('Exportable reports',           false, false, true),
+                ] %}
+                {% for label, small, medium, large in features %}
+                <tr style="border-bottom: 1px solid var(--border); color: var(--background);">
+                  <td style="padding: var(--space-3) var(--space-4); color: var(--background);">{{ label }}</td>
+                  {% for available in [small, medium, large] %}
+                  <td style="text-align: center; padding: var(--space-3) var(--space-4);">
+                    {% if available %}
+                      <!-- <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2.5" color="var(--success)"><polyline points="20 6 9 17 4 12"/></svg> -->
+                      <span style="color: #22c55e; font-size: 1rem; font-weight: 700;">✓</span>
+                      {% else %}
+                      <!-- <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--destructive)" stroke-width="2" color="var(--destructive)"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> -->
+                      <span style="color: #ef4444; font-size: 1rem; font-weight: 700;">✗</span>
+                      {% endif %}
+                  </td>
+                  {% endfor %}
+                </tr>
+                {% endfor %}
+                <!-- Support row with text values instead of tick/cross -->
+                <tr>
+                  <td style="padding: var(--space-3) var(--space-4); color: var(--background);">Email support</td>
+                  <td style="text-align: center; padding: var(--space-3) var(--space-4); color: var(--background); font-size: 0.8rem;">Low priority</td>
+                  <td style="text-align: center; padding: var(--space-3) var(--space-4); color: var(--background); font-size: 0.8rem;">Medium priority</td>
+                  <td style="text-align: center; padding: var(--space-3) var(--space-4); color: var(--background); font-size: 0.8rem;">High priority</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
-          <div style="display: flex; align-items: center; gap: var(--space-2);">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-            <span class="text-secondary" style="font-size: 0.9rem;">Unlimited committees</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: var(--space-2);">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-            <span class="text-secondary" style="font-size: 0.9rem;">Document sharing</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: var(--space-2);">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-            <span class="text-secondary" style="font-size: 0.9rem;">Announcements</span>
-          </div>
-          {% if plan in ['medium', 'large'] %}
-          <div style="display: flex; align-items: center; gap: var(--space-2);">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-            <span class="text-secondary" style="font-size: 0.9rem;">Committee chat rooms</span>
-          </div>
-          {% endif %}
-          {% if plan == 'large' %}
-          <div style="display: flex; align-items: center; gap: var(--space-2);">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-            <span class="text-secondary" style="font-size: 0.9rem;">Advanced analytics</span>
-          </div>
-          <div style="display: flex; align-items: center; gap: var(--space-2);">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-            <span class="text-secondary" style="font-size: 0.9rem;">Exportable reports</span>
-          </div>
-          {% endif %}
         </div>
       </div>
-    </div>
     
-    <div style="margin-top: var(--space-6);">
-      <a href="{{ url_for('bp.dashboard') }}" class="btn btn-outline-secondary ripple">← Back to Dashboard</a>
+    <div style="margin-top: var(--space-6); flex-direction: row; justify-content: flex-end; display: flex;">
+      <a href="{{ url_for('bp.dashboard') }}" class="btn btn-primary ripple">← Back to Dashboard</a>
     </div>
   </div>
 </section>

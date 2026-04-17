@@ -55,7 +55,7 @@
 
         <div class="form-group">
           <label class="form-label" for="password">Password</label>
-          <div class="floating-input-wrapper">
+          <div class="floating-input-wrapper" style="position: relative;">
             <input
               type="password"
               id="password"
@@ -67,13 +67,25 @@
               minlength="8"
             >
             <label for="password">Create a strong password</label>
+            <button type="button" id="toggle-password" class="auth-toggle-password" aria-label="Show password">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-open">
+                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-closed" style="display: none;">
+                <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
+                <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path>
+                <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path>
+                <line x1="2" x2="22" y1="2" y2="22"></line>
+              </svg>
+            </button>
           </div>
           <p class="auth-field-hint">Minimum 8 characters</p>
         </div>
 
         <div class="form-group">
           <label class="form-label" for="password_confirm">Confirm password</label>
-          <div class="floating-input-wrapper">
+          <div class="floating-input-wrapper" style="position: relative;">
             <input
               type="password"
               id="password_confirm"
@@ -85,6 +97,18 @@
               minlength="8"
             >
             <label for="password_confirm">Re-enter your password</label>
+            <button type="button" id="toggle-password-confirm" class="auth-toggle-password" aria-label="Show password">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-open">
+                <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="eye-closed" style="display: none;">
+                <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path>
+                <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path>
+                <path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path>
+                <line x1="2" x2="22" y1="2" y2="22"></line>
+              </svg>
+            </button>
           </div>
         </div>
 
@@ -134,6 +158,33 @@
       setTimeout(function() { ripple.remove(); }, 600);
     });
   });
+
+  // Toggle password visibility
+  function setupPasswordToggle(toggleBtnId, passwordInputId) {
+    const togglePassword = document.querySelector(`#${toggleBtnId}`);
+    const password = document.querySelector(`#${passwordInputId}`);
+    const eyeOpen = togglePassword.querySelector('.eye-open');
+    const eyeClosed = togglePassword.querySelector('.eye-closed');
+
+    togglePassword.addEventListener('click', function (e) {
+      // toggle the type attribute
+      const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+      password.setAttribute('type', type);
+      // toggle the eye / eye-slash icons
+      if (type === 'password') {
+        eyeOpen.style.display = 'block';
+        eyeClosed.style.display = 'none';
+        togglePassword.setAttribute('aria-label', 'Show password');
+      } else {
+        eyeOpen.style.display = 'none';
+        eyeClosed.style.display = 'block';
+        togglePassword.setAttribute('aria-label', 'Hide password');
+      }
+    });
+  }
+
+  setupPasswordToggle('toggle-password', 'password');
+  setupPasswordToggle('toggle-password-confirm', 'password_confirm');
 })();
 </script>
 {% endblock %}

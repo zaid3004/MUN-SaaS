@@ -2,7 +2,12 @@ import os
 import requests
 from typing import Optional, Any, Dict, List
 
-CONVEX_SITE_URL = os.getenv("CONVEX_SITE_URL", "https://keen-frog-550.convex.site")
+# Convex deployment URL - should be set in environment
+# For local dev, Convex runs on http://localhost:3000
+CONVEX_SITE_URL = (
+    os.getenv("CONVEX_SITE_URL") or os.getenv("SITE_URL") or "http://localhost:3000"
+)
+print(f"Convex client using URL: {CONVEX_SITE_URL}")
 
 
 class ConvexClient:

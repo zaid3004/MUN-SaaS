@@ -7,7 +7,6 @@ from flask import (
     url_for,
     session,
     send_file,
-    flash,
     jsonify,
 )
 from .convex_client import convex_client
@@ -26,6 +25,21 @@ from werkzeug.utils import secure_filename
 import csv
 import io
 import secrets
+import bleach
+
+
+def add_notification(message, category="info"):
+    if "notifications" not in session:
+        session["notifications"] = []
+
+    # Create a simplified representation of existing notifications for comparison
+    existing_notifications = set(item["message"] for item in session["notifications"])
+
+    # Only add the new notification if its message is not already in the set
+    if message not in existing_notifications:
+        session["notifications"].append({"message": message, "category": category})
+        session.modified = True
+
 
 bp = Blueprint("bp", __name__)
 
@@ -51,8 +65,11 @@ def check_event_access(event_id):
         return False, "Event not found"
 
     try:
-        status = convex_client.query(
-            "/api/getEventPaymentStatus", {"eventId": str(event_id)}
+        status = (
+            convex_client.query(
+                "/api/getEventPaymentStatus", {"eventId": str(event_id)}
+            )
+            or {}
         )
         if not status:
             return False, "Event not found"
@@ -72,8 +89,11 @@ def check_event_access(event_id):
 def check_delegate_limit(event_id, current_count):
     """Check if delegate count is within plan limits. Returns (can_add, message)."""
     try:
-        status = convex_client.query(
-            "/api/getEventPaymentStatus", {"eventId": str(event_id)}
+        status = (
+            convex_client.query(
+                "/api/getEventPaymentStatus", {"eventId": str(event_id)}
+            )
+            or {}
         )
         if not status:
             return False, "Event not found"
@@ -103,8 +123,8 @@ def health():
 @bp.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
-        name = request.form.get("name")
-        email = request.form.get("email")
+        name = bleach.clean(request.form.get("name"))
+        email = bleach.clean(request.form.get("email"))
         password = request.form.get("password")
         password_confirm = request.form.get("password_confirm")
         if not all([name, email, password, password_confirm]):
@@ -141,7 +161,7 @@ def register():
 @bp.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
-        email = request.form.get("email")
+        email = bleach.clean(request.form.get("email"))
         password = request.form.get("password")
 
         user = convex_client.verify_password(email, password)
@@ -159,7 +179,7 @@ def login():
 @bp.route("/forgot-password", methods=["GET", "POST"])
 def forgot_password():
     if request.method == "POST":
-        email = request.form.get("email")
+        email = bleach.clean(request.form.get("email"))
         user = convex_client.query("/api/getUserByEmail", {"email": email})
         if user:
             token = secrets.token_urlsafe(32)
@@ -178,9 +198,11 @@ def forgot_password():
             except:
                 pass
             print(f"PASSWORD RESET TOKEN for {email}: {token}")
-            flash("Password reset instructions sent to your email", "success")
+            add_notification(
+                "Password reset instructions sent to your email", "success"
+            )
         else:
-            flash(
+            add_notification(
                 "If an account exists with this email, password reset instructions have been sent",
                 "info",
             )
@@ -199,7 +221,7 @@ def reset_password(token):
                 "reset_password.html", error="Passwords do not match"
             )
         # Note: Need to implement password reset mutation in Convex
-        flash("Password reset successfully", "success")
+        add_notification("Password reset successfully", "success")
         return redirect(url_for("bp.login"))
     return render_template("reset_password.html", token=token)
 
@@ -211,51 +233,77 @@ def logout():
 
 
 @bp.route("/dashboard")
+@login_required()
 def dashboard():
-    if "user_id" not in session:
-        return redirect(url_for("bp.login"))
-
     organizer_id = session.get("organizer_id")
     if not organizer_id:
+        add_notification("Organizer ID not found in session.", "error")
         return redirect(url_for("bp.login"))
 
-    events = convex_client.query(
-        "/api/getEventsByOrganizer", {"organizerId": organizer_id}
-    )
-    events = events or []
-
-    unpaid_event_id = None
-    for event in events:
-        status = convex_client.query(
-            "/api/getEventPaymentStatus",
-            {"eventId": str(event.get("_id") or event.get("id"))},
+    try:
+        events = convex_client.query(
+            "/api/getEventsByOrganizer", {"organizerId": organizer_id}
         )
-        if status and not status.get("isPaid"):
-            unpaid_event_id = str(event.get("_id") or event.get("id"))
-            flash(
-                f'Event "{event.get("name")}" requires payment. Please complete billing.',
-                "warning",
+        events = events or []
+
+        unpaid_event_id = None
+        for event in events:
+            event_id = str(event.get("_id") or event.get("id"))
+            status = (
+                convex_client.query("/api/getEventPaymentStatus", {"eventId": event_id})
+                or {}
             )
-            break
+            if not status.get("isPaid"):
+                unpaid_event_id = event_id
+                add_notification(
+                    f'Event "{event.get("name")}" requires payment. Please complete billing.',
+                    "warning",
+                )
+                break  # Stop after finding the first unpaid event
 
-    # Get announcements for these events
-    announcements = []
-    for event in events:
-        event_announcements = convex_client.query(
-            "/api/getAnnouncementsByEvent",
-            {"eventId": str(event.get("_id") or event.get("id"))},
-        )
-        if event_announcements:
-            announcements.extend(event_announcements)
-    announcements.sort(key=lambda x: x.get("createdAt", 0), reverse=True)
-    announcements = announcements[:5]
+        # Get announcements for these events
+        announcements = []
+        if events:
+            event_ids = [str(e.get("_id") or e.get("id")) for e in events]
+            # This could be more efficient with a single query if the backend supports it
+            for event_id in event_ids:
+                event_announcements = convex_client.query(
+                    "/api/getAnnouncementsByEvent", {"eventId": event_id}
+                )
+                if event_announcements:
+                    # Augment announcement with event name
+                    event_name = next(
+                        (
+                            e.get("name")
+                            for e in events
+                            if str(e.get("_id") or e.get("id")) == event_id
+                        ),
+                        "",
+                    )
+                    for ann in event_announcements:
+                        ann["eventName"] = event_name
+                    announcements.extend(event_announcements)
+
+        announcements.sort(key=lambda x: x.get("_creationTime", 0), reverse=True)
+
+        # Simplified data for now, will be fetched properly in their respective pages
+        delegates = []
+        committees = []
+
+    except Exception as e:
+        add_notification(f"An error occurred: {e}", "error")
+        events = []
+        announcements = []
+        delegates = []
+        committees = []
+        unpaid_event_id = None
 
     return render_template(
         "dashboard.html",
         events=events,
-        announcements=announcements,
-        delegates=[],
-        committees=[],
+        announcements=announcements[:5],  # Limit to 5 most recent
+        delegates=delegates,
+        committees=committees,
         unpaid_event_id=unpaid_event_id,
     )
 
@@ -267,9 +315,9 @@ def events():
 
     organizer_id = session.get("organizer_id")
     if request.method == "POST":
-        name = request.form.get("name")
-        start_date_str = request.form.get("start_date") or None
-        end_date_str = request.form.get("end_date") or None
+        name = bleach.clean(request.form.get("name"))
+        start_date_str = bleach.clean(request.form.get("start_date")) or None
+        end_date_str = bleach.clean(request.form.get("end_date")) or None
         start = (
             int(datetime.strptime(start_date_str, "%Y-%m-%d").timestamp() * 1000)
             if start_date_str
@@ -280,7 +328,7 @@ def events():
             if end_date_str
             else None
         )
-        description = request.form.get("description") or None
+        description = bleach.clean(request.form.get("description")) or ""
 
         if not name:
             if request.headers.get("X-Requested-With") == "XMLHttpRequest":
@@ -288,7 +336,8 @@ def events():
             return render_template("events.html", error="Name required")
 
         try:
-            event_id = convex_client.mutation(
+            print(f"Creating event: {name}, organizer_id: {organizer_id}")
+            event_id_obj = convex_client.mutation(
                 "/api/createEvent",
                 {
                     "organizerId": organizer_id,
@@ -299,6 +348,8 @@ def events():
                     "plan": "small",
                 },
             )
+            event_id = event_id_obj.get("eventId")
+            print(f"Event created with ID: {event_id}")
             if request.headers.get("X-Requested-With") == "XMLHttpRequest":
                 return jsonify(
                     {
@@ -309,6 +360,7 @@ def events():
                 )
             return redirect(url_for("bp.billing", event_id=str(event_id)))
         except Exception as e:
+            print(f"Error creating event: {e}")
             if request.headers.get("X-Requested-With") == "XMLHttpRequest":
                 return jsonify({"success": False, "message": str(e)})
             return render_template("events.html", error=str(e))
@@ -328,24 +380,28 @@ def committees(event_id):
     can_access, error = check_event_access(event_id)
     if not can_access:
         if error == "unpaid":
+            add_notification(
+                "Event requires payment. Please complete billing to access committees.",
+                "warning",
+            )
             return redirect(url_for("bp.billing", event_id=event_id))
         elif error == "expired":
-            flash("Event has expired. Please renew.", "error")
+            add_notification("Event has expired. Please renew.", "error")
             return redirect(url_for("bp.billing", event_id=event_id))
         else:
-            flash("Access denied", "error")
+            add_notification("Access denied", "error")
             return redirect(url_for("bp.dashboard"))
 
     if request.method == "POST":
-        name = request.form.get("name")
-        agenda = request.form.get("agenda")
+        name = bleach.clean(request.form.get("name"))
+        agenda = bleach.clean(request.form.get("agenda"))
 
-        chair_name = request.form.get("chair_name")
-        chair_email = request.form.get("chair_email")
+        chair_name = bleach.clean(request.form.get("chair_name"))
+        chair_email = bleach.clean(request.form.get("chair_email"))
         chair_password = request.form.get("chair_password") or "changeme"
 
-        co_chair_name = request.form.get("co_chair_name")
-        co_chair_email = request.form.get("co_chair_email")
+        co_chair_name = bleach.clean(request.form.get("co_chair_name"))
+        co_chair_email = bleach.clean(request.form.get("co_chair_email"))
         co_chair_password = request.form.get("co_chair_password") or "changeme"
 
         args = {"eventId": str(event_id), "name": name}
@@ -390,7 +446,7 @@ def committees(event_id):
                     )
 
         except Exception as e:
-            flash(f"Error creating committee: {e}", "error")
+            add_notification(f"Error creating committee: {e}", "error")
 
         return redirect(url_for("bp.committees", event_id=event_id))
 
@@ -412,25 +468,29 @@ def delegates(event_id):
     can_access, error = check_event_access(event_id)
     if not can_access:
         if error == "unpaid":
+            add_notification(
+                "Event requires payment. Please complete billing to access delegates.",
+                "warning",
+            )
             return redirect(url_for("bp.billing", event_id=event_id))
         elif error == "expired":
-            flash("Event has expired. Please renew.", "error")
+            add_notification("Event has expired. Please renew.", "error")
             return redirect(url_for("bp.billing", event_id=event_id))
         else:
-            flash("Access denied", "error")
+            add_notification("Access denied", "error")
             return redirect(url_for("bp.dashboard"))
 
     if request.method == "POST":
-        name = request.form.get("name")
-        email = request.form.get("email")
-        country = request.form.get("country")
-        committee_id = request.form.get("committee_id") or None
+        name = bleach.clean(request.form.get("name"))
+        email = bleach.clean(request.form.get("email"))
+        country = bleach.clean(request.form.get("country"))
+        committee_id = bleach.clean(request.form.get("committee_id")) or None
         password = request.form.get("password") or "changeme"
 
         # Check if user exists
         existing = convex_client.query("/api/getUserByEmail", {"email": email})
         if existing:
-            flash("Email already registered", "error")
+            add_notification("Email already registered", "error")
             return redirect(url_for("bp.delegates", event_id=event_id))
 
         password_hash = generate_password_hash(password)
@@ -465,7 +525,7 @@ def delegates(event_id):
                 },
             )
         except Exception as e:
-            flash(f"Error creating delegate: {e}", "error")
+            add_notification(f"Error creating delegate: {e}", "error")
 
         return redirect(url_for("bp.delegates", event_id=event_id))
 
@@ -522,21 +582,25 @@ def manage_delegates(event_id):
     can_access, error = check_event_access(event_id)
     if not can_access:
         if error == "unpaid":
+            add_notification(
+                "Event requires payment. Please complete billing to manage delegates.",
+                "warning",
+            )
             return redirect(url_for("bp.billing", event_id=event_id))
         elif error == "expired":
-            flash("Event has expired. Please renew.", "error")
+            add_notification("Event has expired. Please renew.", "error")
             return redirect(url_for("bp.billing", event_id=event_id))
         else:
-            flash("Access denied", "error")
+            add_notification("Access denied", "error")
             return redirect(url_for("bp.dashboard"))
 
     committee_id = request.args.get("committee_id")
 
     if request.method == "POST":
-        name = request.form.get("name")
-        email = request.form.get("email")
-        country = request.form.get("country")
-        delegate_committee_id = request.form.get("committee_id") or None
+        name = bleach.clean(request.form.get("name"))
+        email = bleach.clean(request.form.get("email"))
+        country = bleach.clean(request.form.get("country"))
+        delegate_committee_id = bleach.clean(request.form.get("committee_id")) or None
         password = request.form.get("password") or "changeme"
 
         args = {
@@ -556,9 +620,9 @@ def manage_delegates(event_id):
                         "committeeId": str(delegate_committee_id),
                     },
                 )
-            flash("Delegate added successfully", "success")
+            add_notification("Delegate added successfully", "success")
         except Exception as e:
-            flash(f"Error adding delegate: {e}", "error")
+            add_notification(f"Error adding delegate: {e}", "error")
 
         return redirect(url_for("bp.manage_delegates", event_id=event_id))
 
@@ -733,16 +797,20 @@ def chat(event_id):
     can_access, error = check_event_access(event_id)
     if not can_access:
         if error == "unpaid":
+            add_notification(
+                "Event requires payment. Please complete billing to access chat.",
+                "warning",
+            )
             return redirect(url_for("bp.billing", event_id=event_id))
         elif error == "expired":
-            flash("Event has expired. Please renew.", "error")
+            add_notification("Event has expired. Please renew.", "error")
             return redirect(url_for("bp.billing", event_id=event_id))
         else:
-            flash("Access denied", "error")
+            add_notification("Access denied", "error")
             return redirect(url_for("bp.dashboard"))
 
     if request.method == "POST":
-        text = request.form.get("message")
+        text = bleach.clean(request.form.get("message"))
         if text:
             try:
                 convex_client.mutation(
@@ -754,7 +822,7 @@ def chat(event_id):
                     },
                 )
             except Exception as e:
-                flash(f"Error sending message: {e}", "error")
+                add_notification(f"Error sending message: {e}", "error")
 
     messages = (
         convex_client.query("/api/getChatMessagesByEvent", {"eventId": str(event_id)})
@@ -774,20 +842,64 @@ def announcements(event_id):
         if error == "unpaid":
             return redirect(url_for("bp.billing", event_id=event_id))
         elif error == "expired":
-            flash("Event has expired. Please renew.", "error")
+            add_notification("Event has expired. Please renew.", "error")
             return redirect(url_for("bp.billing", event_id=event_id))
         else:
-            flash("Access denied", "error")
+            add_notification("Access denied", "error")
             return redirect(url_for("bp.dashboard"))
 
     if request.method == "POST":
-        action = request.form.get("action")
+        title = bleach.clean(request.form.get("title"))
+        content = bleach.clean(request.form.get("content"))
+        if title and content:
+            try:
+                convex_client.mutation(
+                    "/api/createAnnouncement",
+                    {
+                        "eventId": str(event_id),
+                        "title": title,
+                        "content": content,
+                        "createdBy": session.get("user_name"),
+                    },
+                )
+                add_notification("Announcement created successfully", "success")
+            except Exception as e:
+                add_notification(f"Error creating announcement: {e}", "error")
+        else:
+            add_notification("Title and content are required", "error")
+        return redirect(url_for("bp.announcements", event_id=event_id))
+
+    announcements = (
+        convex_client.query("/api/getAnnouncementsByEvent", {"eventId": str(event_id)})
+        or []
+    )
+    event = convex_client.query("/api/getEventById", {"id": event_id})
+    return render_template(
+        "announcements.html",
+        announcements=announcements,
+        event=event,
+        event_id=event_id,
+    )
+
+
+@bp.route("/events/<event_id>/manage", methods=["GET", "POST"])
+def manage_event(event_id):
+    if "user_id" not in session:
+        return redirect(url_for("bp.login"))
+
+    event = convex_client.query("/api/getEventById", {"id": event_id})
+    if not event:
+        add_notification("Event not found", "error")
+        return redirect(url_for("bp.events"))
+
+    if request.method == "POST":
+        action = bleach.clean(request.form.get("action"))
 
         if action == "update":
-            name = request.form.get("name")
-            description = request.form.get("description")
-            start_date_str = request.form.get("start_date")
-            end_date_str = request.form.get("end_date")
+            name = bleach.clean(request.form.get("name"))
+            description = bleach.clean(request.form.get("description"))
+            start_date_str = bleach.clean(request.form.get("start_date"))
+            end_date_str = bleach.clean(request.form.get("end_date"))
 
             start_date = (
                 int(datetime.strptime(start_date_str, "%Y-%m-%d").timestamp() * 1000)
@@ -811,24 +923,19 @@ def announcements(event_id):
                         "endDate": end_date,
                     },
                 )
-                flash("Event updated successfully", "success")
+                add_notification("Event updated successfully", "success")
             except Exception as e:
-                flash(f"Error updating event: {e}", "error")
+                add_notification(f"Error updating event: {e}", "error")
 
         elif action == "delete":
             try:
                 convex_client.mutation("/api/deleteEvent", {"id": event_id})
-                flash("Event deleted successfully", "success")
+                add_notification("Event deleted successfully", "success")
                 return redirect(url_for("bp.events"))
             except Exception as e:
-                flash(f"Error deleting event: {e}", "error")
+                add_notification(f"Error deleting event: {e}", "error")
 
-        return redirect(url_for("bp.events"))
-
-    event = convex_client.query("/api/getEventById", {"id": event_id})
-    if not event:
-        flash("Event not found", "error")
-        return redirect(url_for("bp.events"))
+        return redirect(url_for("bp.manage_event", event_id=event_id))
 
     return render_template("manage_events.html", event=event, event_id=event_id)
 
@@ -838,7 +945,7 @@ def delete_announcement(announcement_id):
     if "user_id" not in session or session.get("role") != "organizer":
         return redirect(url_for("bp.login"))
     # Need to implement delete mutation
-    flash("Announcement deleted", "success")
+    add_notification("Announcement deleted", "success")
     return redirect(url_for("bp.dashboard"))
 
 
@@ -849,7 +956,7 @@ def billing(event_id):
 
     event = convex_client.query("/api/getEventById", {"id": str(event_id)})
     if not event:
-        flash("Event not found", "error")
+        add_notification("Event not found", "error")
         return redirect(url_for("bp.dashboard"))
 
     status = (
@@ -861,12 +968,12 @@ def billing(event_id):
     delegate_count = status.get("delegateCount", 0)
 
     if request.method == "POST":
-        selected_plan = request.form.get("plan")
-        is_upgrade = request.form.get("is_upgrade") == "true"
-        current_plan = request.form.get("current_plan", plan)
+        selected_plan = bleach.clean(request.form.get("plan"))
+        is_upgrade = bleach.clean(request.form.get("is_upgrade")) == "true"
+        current_plan = bleach.clean(request.form.get("current_plan", plan))
 
-        site_url = os.getenv("CONVEX_SITE_URL", "https://mun-saas.com")
-        success_url = f"{site_url}/events/{event_id}/billing?success=true&session_id={{CHECKOUT_SESSION_ID}}"
+        site_url = os.getenv("CONVEX_SITE_URL")
+        success_url = f"{site_url}/events/{event_id}/billing/success?session_id={{CHECKOUT_SESSION_ID}}"
         cancel_url = f"{site_url}/events/{event_id}/billing?canceled=true"
 
         user = convex_client.query(
@@ -889,9 +996,9 @@ def billing(event_id):
         if checkout_url:
             return redirect(checkout_url)
         elif is_upgrade:
-            flash("You're already on this plan or a higher plan", "info")
+            add_notification("You're already on this plan or a higher plan", "info")
         else:
-            flash(
+            add_notification(
                 "Event created but payment skipped. Please complete payment.", "warning"
             )
             return redirect(url_for("bp.billing", event_id=event_id))
@@ -919,17 +1026,17 @@ def billing_success(event_id):
 
     session_id = request.args.get("session_id")
     if not session_id:
-        flash("Invalid session", "error")
+        add_notification("Invalid session", "error")
         return redirect(url_for("bp.billing", event_id=event_id))
 
     verification = verify_payment(session_id)
     if not verification.get("paid"):
-        flash("Payment not verified", "error")
+        add_notification("Payment not verified", "error")
         return redirect(url_for("bp.billing", event_id=event_id))
 
     event = convex_client.query("/api/getEventById", {"id": str(event_id)})
     if not event:
-        flash("Event not found", "error")
+        add_notification("Event not found", "error")
         return redirect(url_for("bp.dashboard"))
 
     plan = request.args.get("plan", "small")
@@ -946,8 +1053,32 @@ def billing_success(event_id):
         },
     )
 
-    flash("Payment successful! Your event is now active.", "success")
-    return redirect(url_for("bp.billing", event_id=event_id))
+    add_notification("Payment successful! Your event is now active.", "success")
+    return redirect(url_for("bp.manage_event", event_id=event_id))
+
+
+@bp.route("/notifications")
+@login_required()
+def get_notifications():
+    return jsonify(session.get("notifications", []))
+
+
+@bp.route("/notifications/clear", methods=["POST"])
+@login_required()
+def clear_notifications():
+    session["notifications"] = []
+    return jsonify({"success": True})
+
+
+@bp.route("/notifications/clear/<int:notification_index>", methods=["POST"])
+@login_required()
+def clear_notification(notification_index):
+    if "notifications" in session and 0 <= notification_index < len(
+        session["notifications"]
+    ):
+        session["notifications"].pop(notification_index)
+        session.modified = True
+    return jsonify({"success": True})
 
 
 @bp.route("/webhook/stripe", methods=["POST"])

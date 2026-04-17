@@ -74,7 +74,8 @@ def get_price_id(plan_key: str) -> str:
 
     # Try to get/create the product
     price_id = get_or_create_product(plan_key, PRICING[plan_key])
-    _cached_prices[plan_key] = price_id
+    if price_id:
+        _cached_prices[plan_key] = price_id
     return price_id
 
 

@@ -1,3 +1,4 @@
+
 import { httpRouter } from "convex/server";
 import { httpAction } from "./_generated/server";
 import { internal } from "./_generated/api";
@@ -11,6 +12,18 @@ http.route({
   handler: httpAction(async (ctx, request) => {
     const { email } = await request.json();
     const user = await ctx.runQuery(internal.api.getUserByEmail, { email });
+    return new Response(JSON.stringify(user), {
+      headers: { "Content-Type": "application/json" },
+    });
+  }),
+});
+
+http.route({
+  path: "/api/getUserById",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    const { id } = await request.json();
+    const user = await ctx.runQuery(internal.api.getUserById, { id });
     return new Response(JSON.stringify(user), {
       headers: { "Content-Type": "application/json" },
     });
@@ -71,6 +84,18 @@ http.route({
     const { id } = await request.json();
     const event = await ctx.runQuery(internal.api.getEventById, { id });
     return new Response(JSON.stringify(event), {
+      headers: { "Content-Type": "application/json" },
+    });
+  }),
+});
+
+http.route({
+  path: "/api/getEventPaymentStatus",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    const { eventId } = await request.json();
+    const status = await ctx.runQuery(internal.api.getEventPaymentStatus, { eventId });
+    return new Response(JSON.stringify(status), {
       headers: { "Content-Type": "application/json" },
     });
   }),
@@ -289,18 +314,6 @@ http.route({
   handler: httpAction(async (ctx, request) => {
     const committees = await ctx.runQuery(internal.api.getAllCommittees);
     return new Response(JSON.stringify(committees), {
-      headers: { "Content-Type": "application/json" },
-    });
-  }),
-});
-
-http.route({
-  path: "/api/getEventPaymentStatus",
-  method: "POST",
-  handler: httpAction(async (ctx, request) => {
-    const { eventId } = await request.json();
-    const status = await ctx.runQuery(internal.api.getEventPaymentStatus, { eventId });
-    return new Response(JSON.stringify(status), {
       headers: { "Content-Type": "application/json" },
     });
   }),

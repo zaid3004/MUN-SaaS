@@ -10,6 +10,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.103.0",
     "animate.css": "^4.1.1",
+    "animejs": "^4.3.6",
     "aos": "^2.3.4",
     "convex": "^1.35.1",
     "posthog-js": "^1.201.0"

@@ -1,7 +1,10 @@
 # flask_app/__init__.py
 import os
+from dotenv import load_dotenv
 from datetime import datetime
 from flask import Flask
+
+load_dotenv()
 
 
 def create_app():

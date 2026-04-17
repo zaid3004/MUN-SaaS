@@ -3,6 +3,14 @@
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
+<div class="dashboard-header" style="position: fixed; top: 1rem; right: 1rem; z-index: 1000;">
+  <button class="btn btn-icon" aria-label="Notifications" style="position: relative; display: flex; align-items: center; justify-content: center; cursor: pointer; background: none; border: none; padding: 0.5rem;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="#8b9474" stroke="#8b9474" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+      <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+    </svg>
+  </button>
+</div>
 <!-- Hero Section with Text Carousel -->
 <section class="hero hero-water" style="position: relative; padding: var(--space-16) 0; margin-bottom: var(--space-12); overflow: hidden; border-radius: var(--radius-2xl); background: var(--primary);">
   <div class="water-mesh" aria-hidden="true"></div>
@@ -210,9 +218,9 @@
                   </div>
                   <h5 style="font-size: 1rem; font-weight: 600; margin-bottom: var(--space-2); color: var(--color-background);">{{ event.name }}</h5>
                   <p class="small mb-3" style="color: var(--color-background); font-size: 0.875rem;">{{ event.description[:70] if event.description else 'No description' }}{% if event.description and event.description|length > 70 %}...{% endif %}</p>
-                  <a href="/events/{{ event._id }}/manage_events" class="btn btn-primary btn-sm ripple" style="width: 100%;">
-                    <span>Go to Event</span>
-                  </a>
+                   <a href="{{ url_for('bp.manage_event', event_id=(event._id or event.id)) }}" class="btn btn-primary btn-sm ripple" style="width: 100%;">
+                     <span>Go to Event</span>
+                   </a>
                 </div>
               {% endfor %}
             </div>
@@ -233,5 +241,101 @@
     50% { transform: translateY(-20px) scale(1.05); }
   }
 </style>
+
+{% include '_notification_modal.html' %}
+
+<script>
+  // Notification modal functionality
+  document.addEventListener('DOMContentLoaded', function() {
+    const notificationBtn = document.querySelector('.btn-icon[aria-label="Notifications"]');
+    const modal = document.getElementById('notification-modal');
+    const closeModal = document.querySelector('.close-modal');
+    const notificationList = document.getElementById('notification-list');
+    const clearAllBtn = document.getElementById('clear-all-notifications');
+    const notificationCountBadge = notificationBtn.querySelector('.notification-count');
+
+    function fetchNotifications() {
+      fetch('/notifications')
+        .then(response => response.json())
+        .then(notifications => {
+          renderNotifications(notifications);
+          updateNotificationCount(notifications.length);
+        });
+    }
+
+    function renderNotifications(notifications) {
+      notificationList.innerHTML = '';
+      if (notifications.length === 0) {
+        notificationList.innerHTML = '<p>No new notifications.</p>';
+        clearAllBtn.style.display = 'none';
+        return;
+      }
+
+      clearAllBtn.style.display = 'block';
+      notifications.forEach((notification, index) => {
+        const item = document.createElement('div');
+        item.className = `notification-item notification-${notification.category}`;
+        item.innerHTML = `
+          <p style="color: white;">${notification.message}</p>
+          <button class="clear-notification" data-index="${index}">&times;</button>
+        `;
+        notificationList.appendChild(item);
+      });
+
+      document.querySelectorAll('.clear-notification').forEach(button => {
+        button.addEventListener('click', function() {
+          const index = this.getAttribute('data-index');
+          clearNotification(index);
+        });
+      });
+    }
+
+    function updateNotificationCount(count) {
+      if (count > 0) {
+        if (!notificationCountBadge) {
+          const newBadge = document.createElement('span');
+          newBadge.className = 'notification-count';
+          notificationBtn.appendChild(newBadge);
+        }
+        notificationBtn.querySelector('.notification-count').textContent = count;
+        notificationBtn.querySelector('.notification-count').style.display = 'flex';
+      } else {
+        if (notificationCountBadge) {
+          notificationCountBadge.style.display = 'none';
+        }
+      }
+    }
+
+    function clearNotification(index) {
+      fetch(`/notifications/clear/${index}`, { method: 'POST' })
+        .then(() => fetchNotifications());
+    }
+
+    function clearAllNotifications() {
+      fetch('/notifications/clear', { method: 'POST' })
+        .then(() => fetchNotifications());
+    }
+
+    notificationBtn.addEventListener('click', function() {
+      modal.style.display = 'block';
+      fetchNotifications();
+    });
+
+    closeModal.addEventListener('click', function() {
+      modal.style.display = 'none';
+    });
+
+    window.addEventListener('click', function(event) {
+      if (event.target == modal) {
+        modal.style.display = 'none';
+      }
+    });
+
+    clearAllBtn.addEventListener('click', clearAllNotifications);
+
+    // Initial fetch to show count on page load
+    fetchNotifications();
+  });
+</script>
 
 {% endblock %}

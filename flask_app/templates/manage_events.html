@@ -56,9 +56,6 @@
               </div>
             </div>
             <br>
-            <button type="button" class="btn btn-ghost ripple" onclick="window.location.href='/events/{{ event_id }}/committees'">
-              Cancel
-            </button>
             <div style="display: flex; gap: var(--space-3); justify-content: flex-end;">
               <button type="submit" class="btn btn-primary ripple">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: var(--space-2);">
@@ -67,6 +64,9 @@
                   <polyline points="7 3 7 8 15 8"/>
                 </svg>
                 Save Changes
+              </button>
+              <button type="button" class="btn btn-danger ripple" onclick="window.location.href='/events/{{ event_id }}/committees'">
+                Cancel
               </button>
             </div>
           </form>
@@ -80,7 +80,7 @@
         </div>
         <div class="card-body" style="padding: var(--space-6);">
           <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
-            <a href="/events/{{ event_id }}/committees" class="btn btn-outline-primary ripple" style="justify-content: center;">
+            <a href="/events/{{ event_id }}/committees" class="btn btn-primary ripple" style="justify-content: center; color: var(--background);">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: var(--space-2);">
                 <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                 <circle cx="9" cy="7" r="4"/>
@@ -89,25 +89,33 @@
               </svg>
               Committees
             </a>
-            <a href="/events/{{ event_id }}/announcements" class="btn btn-outline-secondary ripple" style="justify-content: center;">
+            <a href="/events/{{ event_id }}/announcements" class="btn btn-danger ripple" style="justify-content: center; color: var(--background);">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: var(--space-2);">
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
                 <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
               </svg>
               Announcements
             </a>
-            <a href="/events/{{ event_id }}/chat" class="btn btn-outline-accent ripple" style="justify-content: center;">
+            <a href="/events/{{ event_id }}/chat" class="btn btn-secondary ripple" style="justify-content: center; color: var(--background);">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: var(--space-2);">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
               </svg>
               Chat
             </a>
-            <a href="/events/{{ event_id }}/delegates" class="btn btn-outline-tertiary ripple" style="justify-content: center;">
+            <a href="/events/{{ event_id }}/delegates" class="btn btn-sage ripple" style="justify-content: center; color: var(--background);">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: var(--space-2);">
                 <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                 <circle cx="12" cy="7" r="4"/>
               </svg>
               Delegates
+            </a>
+            <a href="/events/{{ event_id }}/billing" class="btn btn-outline-tertiary ripple" style="justify-content: center; color: var(--background);">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: var(--space-2);">
+                <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+                <line x1="16" y1="11" x2="8" y2="11"/>
+                <line x1="16" y1="15" x2="8" y2="15"/>
+              </svg>
+              Billing
             </a>
           </div>
         </div>
@@ -116,8 +124,8 @@
       <!-- Delete Event -->
       <div class="card mun-spotlight-card" style="border: 1px solid var(--color-error);">
         <div class="card-header" style="padding: var(--space-3); border-bottom: 1px solid var(--color-divider); background: color-mix(in srgb, var(--color-error) 10%, transparent);">
-          <h2 class="card-title mb-0" style="color: var(--color-error);">Danger Zone</h2>
-          <p class="text-secondary mb-4">Once you delete an event, there is no going back. Please be certain.</p>
+          <h1 class="card-title mb-4" style="color: var(--color-error); font-size: xx-large;">Danger Zone</h1>
+          <p class="text-secondary mb-0" style="color: var(--background);">Once you delete an event, there is no going back. Please be certain.</p>
           <button type="button" class="btn btn-danger ripple" data-bs-toggle="modal" data-bs-target="#deleteEventModal">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: var(--space-2);">
               <polyline points="3 6 5 6 21 6"/>
