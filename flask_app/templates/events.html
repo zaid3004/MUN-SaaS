@@ -93,9 +93,9 @@
             <div style="position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, var(--primary), var(--accent)); z-index: 1;"></div>
             <div class="card-body" style="padding: var(--space-6); position: relative; z-index: 1;">
               <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-4);">
-                <div class="badge badge-primary" style="font-size: 0.75rem;">{{ e.start_date }}</div>
-                {% if e.end_date %}
-                  <small class="text-secondary" style="font-size: 0.875rem;">→ {{ e.end_date }}</small>
+                <div class="badge badge-primary" style="font-size: 0.75rem;">{{ e.startDate|int|timestamp_to_date if e.startDate else 'No date' }}</div>
+                {% if e.endDate %}
+                  <small class="text-secondary" style="font-size: 0.875rem;">→ {{ e.endDate|int|timestamp_to_date }}</small>
                 {% endif %}
               </div>
               <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: var(--space-3); color: var(--background); line-height: 1.3;">{{ e.name }}</h3>

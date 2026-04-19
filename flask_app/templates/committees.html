@@ -116,7 +116,7 @@
                   <p class="mb-0" style="color: var(--foreground); font-size: 0.9rem;">{{ c.agenda }}</p>
                 </div>
               {% endif %}
-              <a href="/events/{{ event_id }}/delegates/manage?committee_id={{ c.id }}" class="btn btn-outline-primary ripple" style="width: 100%; font-weight: 500;">
+              <a href="/events/{{ event_id }}/delegates/manage?committee_id={{ c._id or c.id }}" class="btn btn-outline-primary ripple" style="width: 100%; font-weight: 500;">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                   <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
                   <circle cx="9" cy="7" r="4"/>

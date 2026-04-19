@@ -9,6 +9,7 @@
       <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
       <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
     </svg>
+    <span class="notification-count" style="display: none; position: absolute; top: 0; right: 0; background: var(--color-error, #ef4444); color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 10px; align-items: center; justify-content: center; font-weight: bold; border: 2px solid var(--color-surface, #fff);">0</span>
   </button>
 </div>
 <!-- Hero Section with Text Carousel -->
@@ -182,8 +183,8 @@
             {% for ann in announcements[:3] %}
               <div class="mb-4 pb-4" style="border-bottom: 1px solid var(--color-divider);">
                 <div class="d-flex justify-between items-center mb-2">
-                  <span class="badge badge-primary">{{ ann.event.name }}</span>
-                  <small class="text-secondary">{{ ann.created_at|default('Recent') }}</small>
+                  <span class="badge badge-primary">{{ ann.eventName }}</span>
+                  <small class="text-secondary">{{ ann._creationTime|int|timestamp_to_date if ann._creationTime else 'Recent' }}</small>
                 </div>
                 <h5 class="mb-2" style="font-size: 1rem; font-weight: 600;">{{ ann.title }}</h5>
                 <p class="mb-0 small" style="color: var(--color-background); font-size: 0.875rem;">{{ ann.content[:100] }}{% if ann.content|length > 100 %}...{% endif %}</p>
@@ -214,11 +215,11 @@
               {% for event in events %}
                 <div class="mun-spotlight-card" style="padding: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-lg); cursor: pointer;">
                   <div class="text-accent small mb-2" style="color: var(--color-accent); font-weight: 600; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em;">
-                    {{ event.start_date }}
+                    {{ event.startDate|int|timestamp_to_date if event.startDate else 'No date' }}
                   </div>
                   <h5 style="font-size: 1rem; font-weight: 600; margin-bottom: var(--space-2); color: var(--color-background);">{{ event.name }}</h5>
                   <p class="small mb-3" style="color: var(--color-background); font-size: 0.875rem;">{{ event.description[:70] if event.description else 'No description' }}{% if event.description and event.description|length > 70 %}...{% endif %}</p>
-                   <a href="{{ url_for('bp.manage_event', event_id=(event._id or event.id)) }}" class="btn btn-primary btn-sm ripple" style="width: 100%;">
+                   <a href="/events/{{ event._id or event.id }}/committees" class="btn btn-primary btn-sm ripple" style="width: 100%;">
                      <span>Go to Event</span>
                    </a>
                 </div>
@@ -242,7 +243,7 @@
   }
 </style>
 
-{% include '_notification_modal.html' %}
+{# Handled in base.html #}
 
 <script>
   // Notification modal functionality

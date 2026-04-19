@@ -203,6 +203,32 @@
 
     <!-- Main Content -->
     <main class="site-main {% block main_class %}{% endblock %}">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          <div class="container mt-4" style="margin-top: 1rem; position: relative; z-index: 100;">
+            {% for category, message in messages %}
+              <div class="alert alert-{{ 'danger' if category == 'error' else 'warning' if category == 'warning' else 'success' if category == 'success' else 'info' }}" style="padding: 1rem; margin-bottom: 1rem; border-radius: var(--radius-lg); position: relative; border-left: 4px solid var(--{{ 'error' if category == 'error' else 'warning' if category == 'warning' else 'success' if category == 'success' else 'primary' }}); background: var(--color-surface); color: white;">
+                {{ message }}
+                <button type="button" class="btn-close-flash" onclick="this.parentElement.remove()" style="position: absolute; top: 0.5rem; right: 0.5rem; background: none; border: none; color: white; cursor: pointer; font-size: 1.2rem;">&times;</button>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      {% if session.notifications %}
+        <div class="container mt-4" style="margin-top: 1rem; position: relative; z-index: 100;">
+          {% for note in session.notifications %}
+            <div class="alert alert-{{ 'danger' if note.category == 'error' else 'warning' if note.category == 'warning' else 'success' if note.category == 'success' else 'info' }}" style="padding: 1rem; margin-bottom: 1rem; border-radius: var(--radius-lg); position: relative; border-left: 4px solid var(--{{ 'error' if note.category == 'error' else 'warning' if note.category == 'warning' else 'success' if note.category == 'success' else 'primary' }}); background: var(--color-surface); color: white;">
+              {{ note.message }}
+              <button type="button" class="btn-close-flash" onclick="this.parentElement.remove()" style="position: absolute; top: 0.5rem; right: 0.5rem; background: none; border: none; color: white; cursor: pointer; font-size: 1.2rem;">&times;</button>
+            </div>
+          {% endfor %}
+          {# Clear notifications from session after displaying them once #}
+          {% set _ = session.pop('notifications', None) %}
+        </div>
+      {% endif %}
+
       <!-- Page Content -->
       {% block content %}{% endblock %}
     </main>

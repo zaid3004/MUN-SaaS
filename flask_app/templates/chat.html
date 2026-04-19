@@ -24,8 +24,8 @@
     <div class="mun-chat-log mun-spotlight-card" style="box-shadow: none;">
       {% for m in messages %}
       <div class="mun-chat-bubble">
-        <strong style="color: var(--foreground);">{{ m.sender.email or m.sender.name }}</strong>
-        <span class="text-secondary small" style="font-size: 0.75rem; margin-left: var(--space-2);">{{ m.timestamp }}</span>
+        <strong style="color: var(--foreground);">{{ m.senderId }}</strong>
+        <span class="text-secondary small" style="font-size: 0.75rem; margin-left: var(--space-2);">{{ m.timestamp|int|timestamp_to_date if m.timestamp else 'Recent' }}</span>
         <div style="margin-top: var(--space-2); color: var(--muted-foreground); line-height: 1.5;">{{ m.message }}</div>
       </div>
       {% endfor %}

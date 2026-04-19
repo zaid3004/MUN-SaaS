@@ -140,10 +140,11 @@ def register():
         # Create organizer and user in Convex
         password_hash = generate_password_hash(password)
         try:
-            organizer_id = convex_client.mutation(
+            result = convex_client.mutation(
                 "/api/registerOrganizer",
                 {"email": email, "passwordHash": password_hash, "name": name},
             )
+            organizer_id = result.get("userId")
             # Get the created user
             user = convex_client.query("/api/getUserByEmail", {"email": email})
             if user:
@@ -337,7 +338,7 @@ def events():
 
         try:
             print(f"Creating event: {name}, organizer_id: {organizer_id}")
-            event_id_obj = convex_client.mutation(
+            result = convex_client.mutation(
                 "/api/createEvent",
                 {
                     "organizerId": organizer_id,
@@ -348,7 +349,8 @@ def events():
                     "plan": "small",
                 },
             )
-            event_id = event_id_obj.get("eventId")
+            event_id = result.get("eventId")
+                
             print(f"Event created with ID: {event_id}")
             if request.headers.get("X-Requested-With") == "XMLHttpRequest":
                 return jsonify(
@@ -413,7 +415,8 @@ def committees(event_id):
             args["coChair"] = co_chair_name
 
         try:
-            convex_client.mutation("/api/createCommittee", args)
+            result = convex_client.mutation("/api/createCommittee", args)
+            committee_id = result.get("committeeId")
 
             if chair_email:
                 existing = convex_client.query(
@@ -610,7 +613,8 @@ def manage_delegates(event_id):
             "country": country,
         }
         try:
-            user_id = convex_client.mutation("/api/createDelegate", args)
+            result = convex_client.mutation("/api/createDelegate", args)
+            user_id = result.get("userId")
             if delegate_committee_id and user_id:
                 convex_client.mutation(
                     "/api/assignDelegateToCommittee",
@@ -860,6 +864,7 @@ def announcements(event_id):
                         "title": title,
                         "content": content,
                         "createdBy": session.get("user_name"),
+                        "isPinned": False,
                     },
                 )
                 add_notification("Announcement created successfully", "success")
@@ -916,11 +921,11 @@ def manage_event(event_id):
                 convex_client.mutation(
                     "/api/updateEvent",
                     {
-                        "id": event_id,
+                        "id": str(event_id),
                         "name": name,
-                        "description": description,
                         "startDate": start_date,
                         "endDate": end_date,
+                        "description": description,
                     },
                 )
                 add_notification("Event updated successfully", "success")
@@ -1054,7 +1059,7 @@ def billing_success(event_id):
     )
 
     add_notification("Payment successful! Your event is now active.", "success")
-    return redirect(url_for("bp.manage_event", event_id=event_id))
+    return redirect(url_for("bp.billing", event_id=event_id, success=True))
 
 
 @bp.route("/notifications")

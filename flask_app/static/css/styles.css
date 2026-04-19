@@ -31,7 +31,9 @@
   --accent: #3f8ad8;
   --accent-foreground: #ffffff;
   --destructive: #dc2626;
-  --sucess: #4ade80;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --error: #ef4444;
   --destructive-foreground: #ffffff;
   --chart-1: #3f8ad8;
   --chart-2: #000000;

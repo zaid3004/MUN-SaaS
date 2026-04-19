@@ -54,7 +54,7 @@
                 <select class="form-control" id="committee_id" name="committee_id">
                   <option value="">None</option>
                   {% for c in committees %}
-                  <option value="{{ c.id }}">{{ c.name }}</option>
+                  <option value="{{ c._id or c.id }}">{{ c.name }}</option>
                   {% endfor %}
                 </select>
               </div>
@@ -126,7 +126,7 @@
                   <span class="text-secondary" style="font-size: 0.85rem;"> · {{ d.email }}</span>
                   <span class="text-secondary" style="font-size: 0.8rem; margin-left: var(--space-2);">· {{ d.country or '—' }}</span>
                 </div>
-                <a href="/events/{{ event_id }}/delegates/{{ d.id }}/edit" class="btn btn-sm btn-outline-primary ripple">Edit</a>
+                <a href="/events/{{ event_id }}/delegates/{{ d._id or d.id }}/edit" class="btn btn-sm btn-outline-primary ripple">Edit</a>
               </div>
             </li>
             {% endfor %}
@@ -136,22 +136,22 @@
           {% endif %}
 
           <form method="post" action="/events/{{ event_id }}/delegates" style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); border-top: 1px solid var(--border); padding-top: var(--space-4);">
-            <input type="hidden" name="committee_id" value="{{ group.committee.id }}">
+            <input type="hidden" name="committee_id" value="{{ group.committee._id or group.committee.id }}">
             <div class="form-group" style="margin-bottom: 0;">
-              <label class="form-label" for="name_{{ group.committee.id }}">Name</label>
-              <input class="form-control" id="name_{{ group.committee.id }}" name="name" placeholder="Delegate name" required>
+              <label class="form-label" for="name_{{ group.committee._id or group.committee.id }}">Name</label>
+              <input class="form-control" id="name_{{ group.committee._id or group.committee.id }}" name="name" placeholder="Delegate name" required>
             </div>
             <div class="form-group" style="margin-bottom: 0;">
-              <label class="form-label" for="email_{{ group.committee.id }}">Email</label>
-              <input class="form-control" id="email_{{ group.committee.id }}" name="email" type="email" placeholder="delegate@school.edu" required>
+              <label class="form-label" for="email_{{ group.committee._id or group.committee.id }}">Email</label>
+              <input class="form-control" id="email_{{ group.committee._id or group.committee.id }}" name="email" type="email" placeholder="delegate@school.edu" required>
             </div>
             <div class="form-group" style="margin-bottom: 0;">
-              <label class="form-label" for="country_{{ group.committee.id }}">Country</label>
-              <input class="form-control" id="country_{{ group.committee.id }}" name="country" placeholder="Country">
+              <label class="form-label" for="country_{{ group.committee._id or group.committee.id }}">Country</label>
+              <input class="form-control" id="country_{{ group.committee._id or group.committee.id }}" name="country" placeholder="Country">
             </div>
             <div class="form-group" style="margin-bottom: 0;">
-              <label class="form-label" for="password_{{ group.committee.id }}">Password</label>
-              <input class="form-control" id="password_{{ group.committee.id }}" name="password" type="password" placeholder="Password" required>
+              <label class="form-label" for="password_{{ group.committee._id or group.committee.id }}">Password</label>
+              <input class="form-control" id="password_{{ group.committee._id or group.committee.id }}" name="password" type="password" placeholder="Password" required>
             </div>
             <button class="btn btn-primary ripple" type="submit" style="grid-column: span 2;">Add delegate</button>
           </form>
@@ -168,7 +168,7 @@
       <li class="mun-list-item mun-spotlight-card">
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: var(--space-2);">
           <span>{{ d.name }} ({{ d.email }}) — {{ d.country or '—' }}</span>
-          <a href="/events/{{ event_id }}/delegates/{{ d.id }}/edit" class="btn btn-sm btn-outline-primary ripple">Edit</a>
+          <a href="/events/{{ event_id }}/delegates/{{ d._id or d.id }}/edit" class="btn btn-sm btn-outline-primary ripple">Edit</a>
         </div>
       </li>
       {% endfor %}

@@ -53,17 +53,7 @@ http.route({
   }),
 });
 
-http.route({
-  path: "/api/loginUser",
-  method: "POST",
-  handler: httpAction(async (ctx, request) => {
-    const { email, password } = await request.json();
-    const user = await ctx.runQuery(internal.api.loginUser, { email, password });
-    return new Response(JSON.stringify(user || null), {
-      headers: { "Content-Type": "application/json" },
-    });
-  }),
-});
+// loginUser removed, Flask backend handles verification directly using getUserByEmail
 
 http.route({
   path: "/api/getEventsByOrganizer",
@@ -249,10 +239,9 @@ http.route({
   method: "POST",
   handler: httpAction(async (ctx, request) => {
     const { eventId, title, content, createdBy, isPinned } = await request.json();
-    const args: any = { eventId, title, content, createdBy };
-    if (isPinned !== null && isPinned !== undefined) args.isPinned = isPinned;
-    const announcementId = await ctx.runMutation(internal.api.createAnnouncement, args);
-    return new Response(JSON.stringify({ announcementId }), {
+    const args: any = { eventId, title, content, createdBy, isPinned: isPinned || false };
+    const result = await ctx.runMutation(internal.api.createAnnouncement, args);
+    return new Response(JSON.stringify(result), {
       headers: { "Content-Type": "application/json" },
     });
   }),

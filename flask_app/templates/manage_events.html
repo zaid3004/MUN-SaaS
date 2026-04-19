@@ -45,13 +45,13 @@
               <div class="col-md-6 mb-3 mb-md-0">
                 <label class="form-label" style="font-weight: 600; color: var(--foreground);">Start Date</label>
                 <input type="date" name="start_date" class="form-control" 
-                  value="{{ event.startDate|int|timestamp_to_date }}" 
+                  value="{{ event.startDate|int|timestamp_to_date if event.startDate else '' }}" 
                   style="background: var(--color-input); border: 1px solid var(--color-border); color: var(--foreground);">
               </div>
               <div class="col-md-6">
                 <label class="form-label" style="font-weight: 600; color: var(--foreground);">End Date</label>
                 <input type="date" name="end_date" class="form-control"
-                  value="{{ event.endDate|int|timestamp_to_date }}"
+                  value="{{ event.endDate|int|timestamp_to_date if event.endDate else '' }}"
                   style="background: var(--color-input); border: 1px solid var(--color-border); color: var(--foreground);">
               </div>
             </div>

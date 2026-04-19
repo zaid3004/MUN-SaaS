@@ -36,31 +36,13 @@ export const registerOrganizer = mutation({
       createdAt: Date.now(),
     });
     
-    return userId;
+    return { userId };
   },
 });
 
-export const loginUser = query({
-  args: { email: v.string(), password: v.string() },
-  handler: async (ctx, { email, password }) => {
-    const user = await ctx.db.query("users").withIndex("email", (q) => q.eq("email", email)).first();
-    if (!user) return null;
-    
-    // Verify password - the stored hash is pbkdf2, we need to check if password matches
-    // We'll import werkzeug's check_password_hash equivalent logic
-    // For now, let's do a simple hash in Python and compare
-    const storedHash = user.passwordHash;
-    
-    // If stored hash looks like pbkdf2, we need special handling
-    // For now, let's just check direct match (not secure for production)
-    // A better approach: let Python pass the already-hashed password
-    // Then we compare stored vs provided hash directly
-    const providedHash = password; // Assume Python passes hash
-    
-    if (storedHash !== providedHash) return null;
-    return user;
-  },
-});
+// loginUser is removed because password verification should happen in the Flask backend
+// to use industry-standard hashing libraries like werkzeug.security.
+// Convex will only be used to retrieve the user by email.
 
 export const getUserById = query({
   args: { id: v.id("users") },
@@ -141,7 +123,7 @@ export const createEvent = mutation({
       expiresAt: undefined,
       delegateCount: 0,
     });
-    return eventId;
+    return { eventId };
   },
 });
 
@@ -221,7 +203,7 @@ export const createCommittee = mutation({
       coChair,
       createdAt: Date.now(),
     });
-    return committeeId;
+    return { committeeId };
   },
 });
 
@@ -255,7 +237,7 @@ export const createDelegate = mutation({
       country,
       createdAt: Date.now(),
     });
-    return userId;
+    return { userId };
   },
 });
 
@@ -272,7 +254,7 @@ export const assignDelegateToCommittee = mutation({
       committeeId,
       createdAt: Date.now(),
     });
-    return assignmentId;
+    return { assignmentId };
   },
 });
 
@@ -297,10 +279,10 @@ export const createAnnouncement = mutation({
       title,
       content,
       createdBy,
-      isPinned,
+      isPinned: isPinned || false,
       createdAt: Date.now(),
     });
-    return announcementId;
+    return { announcementId };
   },
 });
 
@@ -324,7 +306,7 @@ export const sendChatMessage = mutation({
       message,
       timestamp: Date.now(),
     });
-    return messageId;
+    return { messageId };
   },
 });
 

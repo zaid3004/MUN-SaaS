@@ -5,6 +5,7 @@ export const hash = (password: string): string => {
 };
 
 export const verify = (storedHash: string, inputPassword: string): boolean => {
-  // Direct comparison - both Python and Convex use the same hash format from werkzeug
+  // Direct comparison - Passwords are hashed in Python and verified there.
+  // This helper is for consistency in the schema but verification happens in the Flask backend.
   return storedHash === inputPassword;
 };

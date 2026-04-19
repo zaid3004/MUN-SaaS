@@ -1,7 +1,9 @@
 import os
 import stripe
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
 
+load_dotenv()
 stripe.api_key = os.getenv("STRIPE_SECRET_KEY")
 
 PRICING = {
@@ -17,7 +19,7 @@ PRICING = {
     },
     "large": {
         "name": "Large MUN",
-        "price": 500,
+        "price": 499,
         "max_delegates": 250,
         "per_delegate": 2,
     },

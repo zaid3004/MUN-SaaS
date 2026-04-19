@@ -59,27 +59,27 @@
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--space-4); margin-bottom: var(--space-6);">
         {% for plan_key, plan_info in pricing.items() %}
         <div class="card {% if plan == plan_key %}mun-spotlight-card{% else %}mun-card{% endif %}" style="position: relative; padding: var(--space-5); border: 2px solid {% if plan == plan_key %} var(--primary) {% else %} var(--border){% endif %}; border-radius: var(--radius-xl);">
-          
-          {% if plan_key == 'medium' %}
-          <span class="badge badge-primary" style="position: relative; top: calc(var(--space-3) * -1); right: var(--space-3);">Popular</span>
-          {% endif %}
           <h4 style="font-size: 1.1rem; font-weight: 600; color: white; margin-bottom: var(--space-2);">{{ plan_info.name }}</h4>
           <div style="font-size: 1.75rem; font-weight: 700; color: var(--primary); margin-bottom: var(--space-3);">AED {{ plan_info.price }}</div>
           <p class="text-secondary" style="font-size: 0.9rem; margin-bottom: var(--space-4); color: white;">Up to {{ plan_info.max_delegates }} delegates</p>
           
           <form method="post" action="{{ url_for('bp.billing', event_id=event_id) }}">
             <input type="hidden" name="plan" value="{{ plan_key }}">
-            <input type="hidden" name="is_upgrade" value="{% if plan != 'small' and plan_key in ['medium', 'large'] %}true{% else %}false{% endif %}">
+            <input type="hidden" name="is_upgrade" value="{% if plan == 'small' and plan_key in ['medium', 'large'] %}true{% elif plan == 'medium' and plan_key == 'large' %}true{% else %}false{% endif %}">
             <input type="hidden" name="current_plan" value="{{ plan }}">
-            <button type="submit" class="btn {% if plan == plan_key %}btn-primary{% else %}btn-outline-primary{% endif %} ripple" style="width: 100%;" {% if plan == plan_key %}disabled{% endif %}>
-              {% if plan == plan_key %}
-              Current
-              {% elif plan_key in ['medium', 'large'] and plan == 'small' %}
-              Upgrade
-              {% else %}
-              Select
-              {% endif %}
-            </button>
+              <button type="submit" class="btn {% if plan == plan_key %}btn-primary{% else %}btn-outline-primary{% endif %} ripple" style="width: 100%;">
+                {% if plan == plan_key %}
+                  {% if not is_paid %}
+                    Current - Pay
+                  {% else %}
+                    Current
+                  {% endif %}
+                {% elif (plan == 'small' and plan_key in ['medium', 'large']) or (plan == 'medium' and plan_key == 'large') %}
+                  Upgrade & Pay
+                {% else %}
+                  Select
+                {% endif %}
+              </button>
           </form>
         </div>
         {% endfor %}

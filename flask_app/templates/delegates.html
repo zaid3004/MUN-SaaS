@@ -69,7 +69,7 @@
                 <select class="form-control" id="committee_id" name="committee_id">
                   <option value="">None</option>
                   {% for c in committees %}
-                  <option value="{{ c.id }}">{{ c.name }}</option>
+                  <option value="{{ c._id or c.id }}">{{ c.name }}</option>
                   {% endfor %}
                 </select>
               </div>
@@ -91,7 +91,7 @@
       </div>
     </div>
   </div>
-</div>
+</section>
 
 <section class="mb-8">
   <div class="container">
@@ -109,8 +109,8 @@
                 <div class="mun-list-item__meta" style="margin-top: var(--space-1);">{{ d.country or '—' }} · {{ d.committee or 'No committee' }}</div>
               </div>
               <div class="action-buttons" style="display: flex; flex-wrap: wrap; gap: var(--space-2);">
-                <a href="/events/{{ event_id }}/delegates/{{ d.id }}/documents" class="btn btn-sm btn-outline-secondary ripple">Docs</a>
-                <a href="/events/{{ event_id }}/delegates/{{ d.id }}/edit" class="btn btn-sm btn-outline-success ripple">Edit</a>
+                <a href="/events/{{ event_id }}/delegates/{{ d._id or d.id }}/documents" class="btn btn-sm btn-outline-secondary ripple">Docs</a>
+                <a href="/events/{{ event_id }}/delegates/{{ d._id or d.id }}/edit" class="btn btn-sm btn-outline-success ripple">Edit</a>
               </div>
             </div>
           </li>
@@ -124,4 +124,26 @@
     {% endif %}
   </div>
 </section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const filterInput = document.querySelector('[data-instant-filter]');
+  const listItems = document.querySelectorAll('.delegates-list li');
+
+  if (filterInput) {
+    filterInput.addEventListener('input', function() {
+      const query = this.value.toLowerCase().trim();
+      
+      listItems.forEach(item => {
+        const text = item.textContent.toLowerCase();
+        if (text.includes(query)) {
+          item.style.display = '';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    });
+  }
+});
+</script>
 {% endblock %}
